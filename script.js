@@ -1,5 +1,5 @@
 // Reemplaza esta URL con la de tu webhook en n8n
-const webhookUrl = "https://macercreative.app.n8n.cloud/webhook/chat";
+const webhookUrl = "https://macercreative.app.n8n.cloud/webhook-test/chat";
 
 const messagesDiv = document.getElementById("messages");
 const msgInput = document.getElementById("msgInput");
