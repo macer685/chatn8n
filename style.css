@@ -1,0 +1,46 @@
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+  background: #E0EFFF;  /* Fondo azul muy claro */
+  padding: 20px;
+  margin: 0;
+  text-align: center;
+}
+
+/* Título */
+h2 {
+  color: #4169E1;  /* Azul rey */
+  margin-bottom: 20px;
+}
+
+/* Área de mensajes */
+#messages {
+  border: 1px solid #4169E1;
+  padding: 10px;
+  max-width: 400px;
+  min-height: 150px;
+  background: #FFFFFF;
+  margin: 0 auto 10px auto;
+  overflow-y: auto;
+}
+
+/* Estilos para el input y botón */
+input, button {
+  padding: 10px;
+  font-size: 1em;
+  display: inline-block;
+}
+
+/* Botón */
+button {
+  cursor: pointer;
+  background-color: #4169E1; /* Azul rey */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  margin-left: 5px;
+}
+
+button:hover {
+  background-color: #315EBD; /* Tonalidad más oscura */
+}
