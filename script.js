@@ -29,7 +29,7 @@ async function sendMessage() {
     addMessage(data.respuesta || "Sin respuesta", "Bot");
   } catch (error) {
     console.error("Error al enviar:", error);
-    addMessage("Error al comunicarse con el bot.", "Bot");
+    addMessage("Error al comunicarse con el bot.", "Tatiana");
   }
 }
 
