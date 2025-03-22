@@ -26,7 +26,7 @@ async function sendMessage() {
       body: JSON.stringify({ mensaje: msg })
     });
     const data = await response.json();
-    addMessage(data.respuesta || "Sin respuesta", "Bot");
+    addMessage(data.respuesta || "Sin respuesta", "Tatiana");
   } catch (error) {
     console.error("Error al enviar:", error);
     addMessage("Error al comunicarse con el bot.", "Tatiana");
