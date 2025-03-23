@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Chat Bot de macer.digital</title>
-  <!-- Enlaza el archivo CSS -->
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat en Vivo</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h2>Chat de macer.digital</h2>
-  <div id="messages"></div>
-  <input type="text" id="msgInput" placeholder="Escribe tu mensaje">
-  <button id="sendBtn">Enviar</button>
-  <!-- Enlaza el archivo JavaScript -->
-  <script src="script.js"></script>
+    <div class="chat-container">
+        <div class="chat-header">Chat Soporte</div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Escribe tu mensaje...">
+            <button id="send-button">Enviar</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
