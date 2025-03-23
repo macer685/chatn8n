@@ -3,6 +3,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const messagesDiv = document.getElementById("messages");
     const msgInput = document.getElementById("msgInput");
     const sendBtn = document.getElementById("sendBtn");
+    // Asume que ya tienes el resto del código existente
+document.getElementById("backBtn").addEventListener("click", function() {
+    window.location.href = "https://www.macer.digital/";
+});
+
 
     // Función para agregar mensajes al chat
     function addMessage(text, type) {
