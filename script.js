@@ -1,39 +1,46 @@
-// Reemplaza esta URL con la de tu webhook en n8n
-const webhookUrl = "https://macercreative.app.n8n.cloud/webhook/chat";
 
-const messagesDiv = document.getElementById("messages");
-const msgInput = document.getElementById("msgInput");
-const sendBtn = document.getElementById("sendBtn");
+document.addEventListener("DOMContentLoaded", () => {
+  const chatMessages = document.getElementById("chat-messages");
+  const userInput = document.getElementById("user-input");
+  const sendButton = document.getElementById("send-button");
+  const webhookURL = "https://macercreative.app.n8n.cloud/webhook/chat";
 
-// Función para agregar mensajes al área de mensajes
-function addMessage(text, sender) {
-  const msgElement = document.createElement("div");
-  msgElement.textContent = sender + ": " + text;
-  messagesDiv.appendChild(msgElement);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-
-// Función para enviar el mensaje al webhook y mostrar la respuesta
-async function sendMessage() {
-  const msg = msgInput.value.trim();
-  if (!msg) return;
-  addMessage(msg, "Usuario");
-  msgInput.value = "";
-  try {
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mensaje: msg })
-    });
-    const data = await response.json();
-    addMessage(data.respuesta || "Sin respuesta", "Tatiana");
-  } catch (error) {
-    console.error("Error al enviar:", error);
-    addMessage("Error al comunicarse con el bot.", "Tatiana");
+  function appendMessage(text, type) {
+      const messageElement = document.createElement("div");
+      messageElement.classList.add("chat-message", type);
+      messageElement.textContent = text;
+      chatMessages.appendChild(messageElement);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
   }
-}
 
-sendBtn.addEventListener("click", sendMessage);
-msgInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") sendMessage();
+  sendButton.addEventListener("click", async () => {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      appendMessage(message, "sent");
+      userInput.value = "";
+
+      try {
+          const response = await fetch(webhookURL, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ mensaje: message })
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              appendMessage(data.respuesta, "received");
+          } else {
+              appendMessage("Error al recibir respuesta.", "received");
+          }
+      } catch (error) {
+          appendMessage("No se pudo conectar con el servidor.", "received");
+      }
+  });
+
+  userInput.addEventListener("keypress", (event) => {
+      if (event.key === "Enter") sendButton.click();
+  });
 });
