@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
         messageElement.textContent = text;
         messagesDiv.appendChild(messageElement);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
+    }
 
     // Función para enviar mensaje
     async function sendMessage() {
@@ -43,4 +43,5 @@ document.addEventListener("DOMContentLoaded", () => {
         if (event.key === "Enter") sendMessage();
     });
 });
+
 
