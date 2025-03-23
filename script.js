@@ -12,6 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
         messagesDiv.appendChild(messageElement);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
+    function goBack() {
+  window.location.href = "https://www.macer.digital/";
+}
+
 
     // Función para enviar mensaje
     async function sendMessage() {
