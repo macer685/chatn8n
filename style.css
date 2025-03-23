@@ -25,3 +25,55 @@ body {
   text-align: center;
   font-weight: bold;
 }
+
+.chat-messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-message {
+  max-width: 75%;
+  padding: 8px;
+  margin: 5px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.sent {
+  background: #dcf8c6;
+  align-self: flex-end;
+}
+
+.received {
+  background: #fff;
+  border: 1px solid #ddd;
+  align-self: flex-start;
+}
+
+.chat-input {
+  display: flex;
+  padding: 10px;
+  background: #f0f0f0;
+  border-top: 1px solid #ddd;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+}
+
+.chat-input button {
+  margin-left: 5px;
+  padding: 8px;
+  border: none;
+  background: #25d366;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
