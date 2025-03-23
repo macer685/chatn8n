@@ -29,23 +29,3 @@ async function sendMessage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ mensaje: msg })
         });
-
-        const data = await response.json();
-        addMessage(data.respuesta || "Sin respuesta", "Tatiana");
-    } catch (error) {
-        console.error("Error al enviar:", error);
-        addMessage("Error al comunicarse con el bot.", "Tatiana");
-    }
-}
-
-// Evento para botón y tecla "Enter"
-sendBtn.addEventListener("click", sendMessage);
-msgInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") sendMessage();
-});
-
-// Botón volver
-function goBack() {
-    window.location.href = "https://www.macer.digital/";
-}
-
