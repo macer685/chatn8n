@@ -8,6 +8,36 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "https://www.macer.digital/";
     });
 
+    // Función para cargar una imagen con reintentos y forzar actualización de caché
+    function loadImageWithRetry(url, retries = 3) {
+        return new Promise((resolve, reject) => {
+            let attempt = 0;
+            const img = new Image();
+
+            function tryLoad() {
+                // Agregar un parámetro único para forzar la actualización de la caché
+                const urlWithTimestamp = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+                img.src = urlWithTimestamp;
+            }
+
+            img.onload = () => {
+                resolve(img);
+            };
+
+            img.onerror = () => {
+                attempt++;
+                if (attempt < retries) {
+                    tryLoad();
+                } else {
+                    reject(new Error('Error al cargar la imagen tras varios intentos.'));
+                }
+            };
+
+            // Inicia la carga
+            tryLoad();
+        });
+    }
+
     // Función para agregar mensajes al chat (Texto e Imágenes)
     function addMessage(text, type) {
         const messageElement = document.createElement("div");
@@ -26,14 +56,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 messageElement.appendChild(textElement);
             }
 
-            // Crear la imagen
-            const img = document.createElement("img");
-            img.src = match[1];
-            img.alt = "Imagen del producto";
-            img.style.maxWidth = "200px";
-            img.style.borderRadius = "8px";
-            img.style.marginTop = "5px";
-            messageElement.appendChild(img);
+            // Crear un contenedor para la imagen
+            const imageContainer = document.createElement("div");
+            imageContainer.classList.add("chat-image");
+            messageElement.appendChild(imageContainer);
+
+            // Cargar la imagen usando la función con reintentos
+            loadImageWithRetry(match[1])
+                .then(img => {
+                    img.alt = "Imagen del producto";
+                    img.style.maxWidth = "200px";
+                    img.style.borderRadius = "8px";
+                    img.style.marginTop = "5px";
+                    imageContainer.appendChild(img);
+                })
+                .catch(err => {
+                    imageContainer.innerHTML = "<em>No se pudo cargar la imagen</em>";
+                    console.error(err);
+                });
         } else {
             // Si no hay imagen en formato Markdown, solo muestra el texto
             messageElement.innerHTML = text; // Permite negritas y saltos de línea
@@ -73,5 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (event.key === "Enter") sendMessage();
     });
 });
+
 
 
