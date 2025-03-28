@@ -1,114 +1,83 @@
-/* Reset básico */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+document.addEventListener("DOMContentLoaded", () => {
+  const webhookUrl = "https://macercreative.app.n8n.cloud/webhook/chat";
+  const messagesDiv = document.getElementById("messages");
+  const msgInput = document.getElementById("msgInput");
+  const sendBtn = document.getElementById("sendBtn");
 
-body {
-    font-family: Arial, sans-serif;
-    background: #ece5dd;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
+  document.getElementById("backBtn").addEventListener("click", function () {
+    window.location.href = "https://www.macer.digital/";
+  });
 
-/* Contenedor del chat */
-.chat-container {
-    width: 90%;
-    max-width: 400px;
-    background: #fff;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
+  // Función para agregar mensajes al chat (Texto e Imágenes)
+  function addMessage(text, type) {
+    const messageElement = document.createElement("div");
+    messageElement.classList.add("chat-message", type);
 
-/* Encabezado del chat */
-.chat-header {
-    background: #075e54;
-    color: white;
-    padding: 15px;
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-}
+    // Expresión regular para detectar imágenes en formato Markdown ![Texto](URL)
+    const markdownImageRegex = /!\[.*?\]\((https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))\)/i;
+    const match = text.match(markdownImageRegex);
 
-/* Área de mensajes */
-.chat-messages {
-    flex: 1;
-    padding: 10px;
-    overflow-y: auto;
-    max-height: 450px;
-    display: flex;
-    flex-direction: column;
-    background: #f8f8f8;
-}
+    if (match) {
+      // Extraer el texto sin la imagen
+      const textWithoutImage = text.replace(markdownImageRegex, "").trim();
+      if (textWithoutImage) {
+        const textElement = document.createElement("p");
+        textElement.innerHTML = textWithoutImage; // Permite negritas y formato
+        messageElement.appendChild(textElement);
+      }
 
-/* Mensajes */
-.chat-message {
-    max-width: 75%;
-    padding: 10px;
-    margin: 5px;
-    border-radius: 10px;
-    font-size: 14px;
-    word-wrap: break-word;
-}
+      // Crear la imagen
+      const img = document.createElement("img");
+      let imageUrl = match[1];
 
-.sent {
-    background: #dcf8c6;
-    align-self: flex-end;
-}
-
-.received {
-    background: #ffffff;
-    border: 1px solid #ddd;
-    align-self: flex-start;
-}
-
-/* Entrada de texto */
-.chat-input {
-    display: flex;
-    padding: 10px;
-    background: #f0f0f0;
-    border-top: 1px solid #ddd;
-}
-
-.chat-input input {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    outline: none;
-    font-size: 16px;
-}
-
-.chat-input button {
-    margin-left: 5px;
-    padding: 10px;
-    border: none;
-    background: #25d366;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: 0.3s;
-}
-
-.chat-input button:hover {
-    background: #1ebe57;
-}
-
-/* Ajustes para móviles */
-@media screen and (max-width: 480px) {
-    .chat-container {
-        width: 95%;
+      // Si la URL es de Cloudinary, se le agrega una transformación para 300x300 píxeles.
+      if (imageUrl.includes("res.cloudinary.com")) {
+        // Inserta "w_300,h_300,c_fill" después de "/upload/" para redimensionar y recortar
+        imageUrl = imageUrl.replace("/upload/", "/upload/w_300,h_300,c_fill/");
+      }
+      img.src = imageUrl;
+      img.alt = "Imagen del producto";
+      img.style.maxWidth = "200px";
+      img.style.borderRadius = "8px";
+      img.style.marginTop = "5px";
+      messageElement.appendChild(img);
+    } else {
+      // Si no hay imagen en formato Markdown, solo muestra el texto
+      messageElement.innerHTML = text; // Permite negritas y saltos de línea
     }
 
-    .chat-messages {
-        max-height: 70vh;
+    messagesDiv.appendChild(messageElement);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  // Función para enviar mensaje
+  async function sendMessage() {
+    const msg = msgInput.value.trim();
+    if (!msg) return;
+    addMessage(msg, "sent");
+    msgInput.value = "";
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mensaje: msg })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        addMessage(data.respuesta || "Sin respuesta", "received");
+      } else {
+        addMessage("Error en la respuesta del servidor.", "received");
+      }
+    } catch (error) {
+      addMessage("No se pudo conectar con el servidor.", "received");
     }
-}
+  }
+
+  sendBtn.addEventListener("click", sendMessage);
+  msgInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") sendMessage();
+  });
+});
+
