@@ -8,16 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "https://www.macer.digital/";
     });
 
-    // Función para cargar una imagen con reintentos y forzar actualización de caché
+    // Función para cargar una imagen con reintentos (sin forzar timestamp)
     function loadImageWithRetry(url, retries = 3) {
         return new Promise((resolve, reject) => {
             let attempt = 0;
             const img = new Image();
 
             function tryLoad() {
-                // Agregar un parámetro único para forzar la actualización de la caché
-                const urlWithTimestamp = url + (url.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
-                img.src = urlWithTimestamp;
+                img.src = url; // Se usa la URL original
             }
 
             img.onload = () => {
@@ -33,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             };
 
-            // Inicia la primera carga
             tryLoad();
         });
     }
@@ -43,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const messageElement = document.createElement("div");
         messageElement.classList.add("chat-message", type);
 
-        // Nueva expresión regular para capturar correctamente la URL de la imagen (incluye parámetros)
+        // Nueva expresión regular para capturar la URL de la imagen (incluye parámetros si los hubiera)
         const markdownImageRegex = /!\[.*?\]\((https?:\/\/[^\)]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\)]+)?)\)/i;
         const match = text.match(markdownImageRegex);
 
@@ -61,10 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
             imageContainer.classList.add("chat-image");
             messageElement.appendChild(imageContainer);
 
-            // Mostrar en consola la URL extraída para depuración
             console.log("URL extraída:", match[1]);
 
-            // Cargar la imagen usando la función con reintentos
+            // Cargar la imagen usando la función con reintentos (sin timestamp)
             loadImageWithRetry(match[1])
                 .then(img => {
                     img.alt = "Imagen del producto";
@@ -116,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (event.key === "Enter") sendMessage();
     });
 });
+
 
 
 
