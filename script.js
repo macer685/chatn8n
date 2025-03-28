@@ -8,22 +8,25 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "https://www.macer.digital/";
     });
 
-    // Función para cargar una imagen con reintentos (sin forzar timestamp)
+    // Función para cargar una imagen con reintentos usando la URL original (sin timestamp)
     function loadImageWithRetry(url, retries = 3) {
         return new Promise((resolve, reject) => {
             let attempt = 0;
             const img = new Image();
 
             function tryLoad() {
-                img.src = url; // Se usa la URL original
+                console.log("Intento de carga de la imagen, intento:", attempt + 1, " URL:", url);
+                img.src = url;
             }
 
             img.onload = () => {
+                console.log("Imagen cargada correctamente.");
                 resolve(img);
             };
 
             img.onerror = () => {
                 attempt++;
+                console.warn("Error al cargar la imagen, intento:", attempt);
                 if (attempt < retries) {
                     tryLoad();
                 } else {
@@ -40,16 +43,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const messageElement = document.createElement("div");
         messageElement.classList.add("chat-message", type);
 
-        // Nueva expresión regular para capturar la URL de la imagen (incluye parámetros si los hubiera)
+        // Nueva expresión regular para capturar la URL de la imagen (incluyendo parámetros, si existen)
         const markdownImageRegex = /!\[.*?\]\((https?:\/\/[^\)]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\)]+)?)\)/i;
         const match = text.match(markdownImageRegex);
 
         if (match) {
+            console.log("Markdown detectado. URL extraída:", match[1]);
+
             // Extraer el texto sin la imagen
             const textWithoutImage = text.replace(markdownImageRegex, "").trim();
             if (textWithoutImage) {
                 const textElement = document.createElement("p");
-                textElement.innerHTML = textWithoutImage; // Permite negritas y formato
+                textElement.innerHTML = textWithoutImage; // Permite formato HTML (como negritas)
                 messageElement.appendChild(textElement);
             }
 
@@ -58,9 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
             imageContainer.classList.add("chat-image");
             messageElement.appendChild(imageContainer);
 
-            console.log("URL extraída:", match[1]);
-
-            // Cargar la imagen usando la función con reintentos (sin timestamp)
+            // Cargar la imagen usando la función con reintentos
             loadImageWithRetry(match[1])
                 .then(img => {
                     img.alt = "Imagen del producto";
@@ -74,8 +77,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.error(err);
                 });
         } else {
+            console.log("No se detectó formato markdown de imagen.");
             // Si no hay imagen en formato Markdown, solo muestra el texto
-            messageElement.innerHTML = text; // Permite negritas y saltos de línea
+            messageElement.innerHTML = text;
         }
 
         messagesDiv.appendChild(messageElement);
@@ -112,6 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (event.key === "Enter") sendMessage();
     });
 });
+
 
 
 
