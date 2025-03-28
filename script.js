@@ -10,85 +10,38 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "https://www.macer.digital/";
   });
 
-  // Mapeo básico de códigos de emojis a sus equivalentes Unicode
-  const emojiMap = {
-    ":smile:": "😄",
-    ":heart:": "❤️",
-    ":thumbsup:": "👍",
-    ":laughing:": "😆",
-    ":wink:": "😉",
-    ":cry:": "😢",
-    // Agrega más emojis según necesites
-  };
-
-  /**
-   * Función que reemplaza códigos de emoji (ej. :smile:) por su versión Unicode.
-   */
-  function replaceEmojis(text) {
-    return text.replace(/:\w+:/g, match => emojiMap[match] || match);
-  }
-
-  /**
-   * Función para modificar la URL de Cloudinary.
-   * Si la URL es de Cloudinary y no tiene transformaciones, inserta "w_300,h_300,c_fill".
-   */
-  function modifyCloudinaryUrl(url) {
-    if (url.includes("res.cloudinary.com")) {
-      const parts = url.split("/upload/");
-      if (parts.length === 2) {
-        const pathAfterUpload = parts[1];
-        // Si el segmento después de "/upload/" NO comienza con parámetros (p.ej.: w_ o h_ o c_),
-        // se asume que no tiene transformaciones y se le insertan.
-        if (!pathAfterUpload.match(/^(w_|h_|c_)/)) {
-          return parts[0] + "/upload/w_300,h_300,c_fill/" + pathAfterUpload;
-        } else {
-          // Ya tiene transformación; se retorna la URL sin modificar.
-          return url;
-        }
-      }
-    }
-    return url;
-  }
-
   /**
    * Agrega un mensaje al chat.
-   * Si detecta una imagen en formato Markdown, la procesa y la muestra.
+   * Si detecta una imagen en formato Markdown (ejemplo: ![Texto](URL)), la muestra.
+   * Se utiliza la URL original de la imagen, ya que comentas que funcionan en el navegador.
    */
   function addMessage(text, type) {
     const messageElement = document.createElement("div");
     messageElement.classList.add("chat-message", type);
 
-    // Primero, reemplazamos los códigos de emojis por sus versiones Unicode
-    const processedText = replaceEmojis(text);
-
     // Expresión regular para detectar imágenes en formato Markdown: ![Texto](URL)
     const markdownImageRegex = /!\[.*?\]\((https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))\)/i;
-    const match = processedText.match(markdownImageRegex);
+    const match = text.match(markdownImageRegex);
 
     if (match) {
-      // Extrae el texto sin la imagen
-      const textWithoutImage = processedText.replace(markdownImageRegex, "").trim();
+      // Si hay texto adicional, se muestra
+      const textWithoutImage = text.replace(markdownImageRegex, "").trim();
       if (textWithoutImage) {
         const textElement = document.createElement("p");
-        textElement.innerHTML = textWithoutImage; // Permite formato (como negritas y emojis)
+        textElement.innerHTML = textWithoutImage;
         messageElement.appendChild(textElement);
       }
-
-      // Procesa la URL de la imagen
-      let imageUrl = match[1];
-      imageUrl = modifyCloudinaryUrl(imageUrl);
-
-      // Crea y configura el elemento imagen
+      // Se crea y configura el elemento de imagen usando la URL original
       const img = document.createElement("img");
-      img.src = imageUrl;
-      img.alt = "Imagen del producto";
+      img.src = match[1];
+      img.alt = "Imagen";
       img.style.maxWidth = "200px";
       img.style.borderRadius = "8px";
       img.style.marginTop = "5px";
       messageElement.appendChild(img);
     } else {
-      // Si no se detecta imagen, muestra el texto directamente
-      messageElement.innerHTML = processedText;
+      // Si no se detecta imagen, se muestra el texto completo
+      messageElement.innerHTML = text;
     }
 
     messagesDiv.appendChild(messageElement);
@@ -103,14 +56,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!msg) return;
     addMessage(msg, "sent");
     msgInput.value = "";
-
     try {
       const response = await fetch(webhookUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mensaje: msg })
       });
-
       if (response.ok) {
         const data = await response.json();
         addMessage(data.respuesta || "Sin respuesta", "received");
