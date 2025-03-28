@@ -8,78 +8,35 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "https://www.macer.digital/";
     });
 
-    // Función para cargar una imagen con reintentos usando la URL original (sin timestamp)
-    function loadImageWithRetry(url, retries = 3) {
-        return new Promise((resolve, reject) => {
-            let attempt = 0;
-            const img = new Image();
-
-            function tryLoad() {
-                console.log("Intento de carga de la imagen, intento:", attempt + 1, " URL:", url);
-                img.src = url;
-            }
-
-            img.onload = () => {
-                console.log("Imagen cargada correctamente.");
-                resolve(img);
-            };
-
-            img.onerror = () => {
-                attempt++;
-                console.warn("Error al cargar la imagen, intento:", attempt);
-                if (attempt < retries) {
-                    tryLoad();
-                } else {
-                    reject(new Error('Error al cargar la imagen tras varios intentos.'));
-                }
-            };
-
-            tryLoad();
-        });
-    }
-
     // Función para agregar mensajes al chat (Texto e Imágenes)
     function addMessage(text, type) {
         const messageElement = document.createElement("div");
         messageElement.classList.add("chat-message", type);
 
-        // Nueva expresión regular para capturar la URL de la imagen (incluyendo parámetros, si existen)
-        const markdownImageRegex = /!\[.*?\]\((https?:\/\/[^\)]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\)]+)?)\)/i;
+        // Expresión regular para detectar imágenes en formato Markdown ![Texto](URL)
+        const markdownImageRegex = /!\[.*?\]\((https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))\)/i;
         const match = text.match(markdownImageRegex);
 
         if (match) {
-            console.log("Markdown detectado. URL extraída:", match[1]);
-
             // Extraer el texto sin la imagen
             const textWithoutImage = text.replace(markdownImageRegex, "").trim();
             if (textWithoutImage) {
                 const textElement = document.createElement("p");
-                textElement.innerHTML = textWithoutImage; // Permite formato HTML (como negritas)
+                textElement.innerHTML = textWithoutImage; // Permite negritas y formato
                 messageElement.appendChild(textElement);
             }
 
-            // Crear un contenedor para la imagen
-            const imageContainer = document.createElement("div");
-            imageContainer.classList.add("chat-image");
-            messageElement.appendChild(imageContainer);
-
-            // Cargar la imagen usando la función con reintentos
-            loadImageWithRetry(match[1])
-                .then(img => {
-                    img.alt = "Imagen del producto";
-                    img.style.maxWidth = "200px";
-                    img.style.borderRadius = "8px";
-                    img.style.marginTop = "5px";
-                    imageContainer.appendChild(img);
-                })
-                .catch(err => {
-                    imageContainer.innerHTML = "<em>No se pudo cargar la imagen</em>";
-                    console.error(err);
-                });
+            // Crear la imagen
+            const img = document.createElement("img");
+            img.src = match[1];
+            img.alt = "Imagen del producto";
+            img.style.maxWidth = "200px";
+            img.style.borderRadius = "8px";
+            img.style.marginTop = "5px";
+            messageElement.appendChild(img);
         } else {
-            console.log("No se detectó formato markdown de imagen.");
             // Si no hay imagen en formato Markdown, solo muestra el texto
-            messageElement.innerHTML = text;
+            messageElement.innerHTML = text; // Permite negritas y saltos de línea
         }
 
         messagesDiv.appendChild(messageElement);
@@ -116,6 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (event.key === "Enter") sendMessage();
     });
 });
+
 
 
 
