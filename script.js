@@ -10,6 +10,24 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "https://www.macer.digital/";
   });
 
+  // Mapeo básico de códigos de emojis a sus equivalentes Unicode
+  const emojiMap = {
+    ":smile:": "😄",
+    ":heart:": "❤️",
+    ":thumbsup:": "👍",
+    ":laughing:": "😆",
+    ":wink:": "😉",
+    ":cry:": "😢",
+    // Agrega más emojis según necesites
+  };
+
+  /**
+   * Función que reemplaza códigos de emoji (ej. :smile:) por su versión Unicode.
+   */
+  function replaceEmojis(text) {
+    return text.replace(/:\w+:/g, match => emojiMap[match] || match);
+  }
+
   /**
    * Función para modificar la URL de Cloudinary.
    * Si la URL es de Cloudinary y no tiene transformaciones, inserta "w_300,h_300,c_fill".
@@ -40,23 +58,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageElement = document.createElement("div");
     messageElement.classList.add("chat-message", type);
 
+    // Primero, reemplazamos los códigos de emojis por sus versiones Unicode
+    const processedText = replaceEmojis(text);
+
     // Expresión regular para detectar imágenes en formato Markdown: ![Texto](URL)
     const markdownImageRegex = /!\[.*?\]\((https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))\)/i;
-    const match = text.match(markdownImageRegex);
+    const match = processedText.match(markdownImageRegex);
 
     if (match) {
       // Extrae el texto sin la imagen
-      const textWithoutImage = text.replace(markdownImageRegex, "").trim();
+      const textWithoutImage = processedText.replace(markdownImageRegex, "").trim();
       if (textWithoutImage) {
         const textElement = document.createElement("p");
-        textElement.innerHTML = textWithoutImage; // Permite formato (negritas, etc.)
+        textElement.innerHTML = textWithoutImage; // Permite formato (como negritas y emojis)
         messageElement.appendChild(textElement);
       }
 
       // Procesa la URL de la imagen
       let imageUrl = match[1];
       imageUrl = modifyCloudinaryUrl(imageUrl);
-      
+
       // Crea y configura el elemento imagen
       const img = document.createElement("img");
       img.src = imageUrl;
@@ -67,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
       messageElement.appendChild(img);
     } else {
       // Si no se detecta imagen, muestra el texto directamente
-      messageElement.innerHTML = text;
+      messageElement.innerHTML = processedText;
     }
 
     messagesDiv.appendChild(messageElement);
@@ -106,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.key === "Enter") sendMessage();
   });
 });
+
 
 
 
