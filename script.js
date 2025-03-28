@@ -11,82 +11,73 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /**
-   * Función para agregar un mensaje al chat.
-   * Se detectan imágenes en formato Markdown, por ejemplo:
-   *   ![Texto alternativo](URL_de_la_imagen)
-   * La URL se extrae tal cual y se utiliza sin modificaciones.
+   * Agrega un mensaje al chat.
+   * Detecta imágenes en formato Markdown y las muestra correctamente.
    */
   function addMessage(text, type) {
     const messageElement = document.createElement("div");
     messageElement.classList.add("chat-message", type);
 
-    // Expresión regular global para detectar imágenes en formato Markdown
-    // match[1] = texto alternativo, match[2] = URL de la imagen (ej.: https://res.cloudinary.com/...)
-    const regex = /!\[(.*?)\]\((https?:\/\/.*?\.(?:png|jpg|jpeg|gif|webp))\)/gi;
+    // Expresión regular para detectar imágenes en formato Markdown
+    const markdownImageRegex = /!\[.*?\]\((https?:\/\/.*?\.(?:png|jpg|jpeg|gif|webp))\)/gi;
     let lastIndex = 0;
     let match;
 
-    // Bucle para recorrer todas las imágenes en el mensaje
-    while ((match = regex.exec(text)) !== null) {
-      // Agregar el texto que se encuentre antes de la imagen (si existe)
+    while ((match = markdownImageRegex.exec(text)) !== null) {
       if (match.index > lastIndex) {
         const textFragment = text.substring(lastIndex, match.index).trim();
         if (textFragment) {
-          const p = document.createElement("p");
-          p.innerHTML = textFragment;
-          messageElement.appendChild(p);
+          const textElement = document.createElement("p");
+          textElement.innerHTML = textFragment;
+          messageElement.appendChild(textElement);
         }
       }
 
-      // Imprime en consola la URL para verificar que es la que viene de la DB
-      console.log("Insertando imagen con URL:", match[2]);
-
-      // Crear el elemento de imagen usando la URL exacta extraída
+      // Agregar imagen correctamente
       const img = document.createElement("img");
-      img.src = match[2];
-      img.alt = match[1] || "Imagen";
-      img.style.maxWidth = "200px"; // Puedes ajustar este valor según necesites
+      img.src = match[1];
+      img.alt = "Imagen";
+      img.style.maxWidth = "100%";
       img.style.borderRadius = "8px";
       img.style.marginTop = "5px";
       messageElement.appendChild(img);
 
-      // Actualizar lastIndex para seguir con la búsqueda en el mensaje
-      lastIndex = regex.lastIndex;
+      lastIndex = markdownImageRegex.lastIndex;
     }
 
-    // Agregar cualquier texto que quede después de la última imagen
+    // Agregar texto que queda después de la última imagen
     if (lastIndex < text.length) {
       const remainingText = text.substring(lastIndex).trim();
       if (remainingText) {
-        const p = document.createElement("p");
-        p.innerHTML = remainingText;
-        messageElement.appendChild(p);
+        const textElement = document.createElement("p");
+        textElement.innerHTML = remainingText;
+        messageElement.appendChild(textElement);
       }
     }
 
-    // Agrega el mensaje completo al contenedor y ajusta el scroll
     messagesDiv.appendChild(messageElement);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 
   /**
-   * Función para enviar el mensaje al webhook y mostrar la respuesta.
+   * Enviar mensaje al servidor y mostrar respuesta.
    */
   async function sendMessage() {
     const msg = msgInput.value.trim();
     if (!msg) return;
-    // Se agrega el mensaje del usuario al chat
+
     addMessage(msg, "sent");
     msgInput.value = "";
+    
     try {
       const response = await fetch(webhookUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mensaje: msg })
       });
+
       if (response.ok) {
         const data = await response.json();
-        // Se agrega la respuesta del servidor al chat
         addMessage(data.respuesta || "Sin respuesta", "received");
       } else {
         addMessage("Error en la respuesta del servidor.", "received");
@@ -96,13 +87,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Eventos para enviar mensaje al hacer clic en "Enviar" o presionar "Enter"
   sendBtn.addEventListener("click", sendMessage);
   msgInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") sendMessage();
   });
 });
-
 
 
 
