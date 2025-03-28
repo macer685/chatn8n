@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             };
 
-            // Inicia la carga
+            // Inicia la primera carga
             tryLoad();
         });
     }
@@ -43,8 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const messageElement = document.createElement("div");
         messageElement.classList.add("chat-message", type);
 
-        // Expresión regular para detectar imágenes en formato Markdown ![Texto](URL)
-        const markdownImageRegex = /!\[.*?\]\((https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))\)/i;
+        // Nueva expresión regular para capturar correctamente la URL de la imagen (incluye parámetros)
+        const markdownImageRegex = /!\[.*?\]\((https?:\/\/[^\)]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\)]+)?)\)/i;
         const match = text.match(markdownImageRegex);
 
         if (match) {
@@ -60,6 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const imageContainer = document.createElement("div");
             imageContainer.classList.add("chat-image");
             messageElement.appendChild(imageContainer);
+
+            // Mostrar en consola la URL extraída para depuración
+            console.log("URL extraída:", match[1]);
 
             // Cargar la imagen usando la función con reintentos
             loadImageWithRetry(match[1])
