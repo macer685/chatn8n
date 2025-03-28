@@ -11,20 +11,24 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /**
-   * Agrega un mensaje al chat. Esta versión renderiza todas las imágenes en formato Markdown.
+   * Función para agregar un mensaje al chat.
+   * Se detectan imágenes en formato Markdown, por ejemplo:
+   *   ![Texto alternativo](URL_de_la_imagen)
+   * La URL se extrae tal cual y se utiliza sin modificaciones.
    */
   function addMessage(text, type) {
     const messageElement = document.createElement("div");
     messageElement.classList.add("chat-message", type);
 
-    // Expresión regular global para detectar imágenes en Markdown: ![Texto](URL)
+    // Expresión regular global para detectar imágenes en formato Markdown
+    // match[1] = texto alternativo, match[2] = URL de la imagen (ej.: https://res.cloudinary.com/...)
     const regex = /!\[(.*?)\]\((https?:\/\/.*?\.(?:png|jpg|jpeg|gif|webp))\)/gi;
     let lastIndex = 0;
     let match;
 
-    // Procesa cada coincidencia en el texto
+    // Bucle para recorrer todas las imágenes en el mensaje
     while ((match = regex.exec(text)) !== null) {
-      // Agrega el texto que aparezca antes de la imagen
+      // Agregar el texto que se encuentre antes de la imagen (si existe)
       if (match.index > lastIndex) {
         const textFragment = text.substring(lastIndex, match.index).trim();
         if (textFragment) {
@@ -34,19 +38,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Crea y configura el elemento de imagen con la URL extraída
+      // Imprime en consola la URL para verificar que es la que viene de la DB
+      console.log("Insertando imagen con URL:", match[2]);
+
+      // Crear el elemento de imagen usando la URL exacta extraída
       const img = document.createElement("img");
-      img.src = match[2]; // match[2] contiene la URL de la imagen
+      img.src = match[2];
       img.alt = match[1] || "Imagen";
-      img.style.maxWidth = "200px";
+      img.style.maxWidth = "200px"; // Puedes ajustar este valor según necesites
       img.style.borderRadius = "8px";
       img.style.marginTop = "5px";
       messageElement.appendChild(img);
 
-      lastIndex = regex.lastIndex; // Actualiza el índice para continuar la búsqueda
+      // Actualizar lastIndex para seguir con la búsqueda en el mensaje
+      lastIndex = regex.lastIndex;
     }
 
-    // Agrega cualquier texto restante después de la última imagen
+    // Agregar cualquier texto que quede después de la última imagen
     if (lastIndex < text.length) {
       const remainingText = text.substring(lastIndex).trim();
       if (remainingText) {
@@ -56,16 +64,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    // Agrega el mensaje completo al contenedor y ajusta el scroll
     messagesDiv.appendChild(messageElement);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 
   /**
-   * Envía el mensaje al webhook y muestra la respuesta.
+   * Función para enviar el mensaje al webhook y mostrar la respuesta.
    */
   async function sendMessage() {
     const msg = msgInput.value.trim();
     if (!msg) return;
+    // Se agrega el mensaje del usuario al chat
     addMessage(msg, "sent");
     msgInput.value = "";
     try {
@@ -76,6 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       if (response.ok) {
         const data = await response.json();
+        // Se agrega la respuesta del servidor al chat
         addMessage(data.respuesta || "Sin respuesta", "received");
       } else {
         addMessage("Error en la respuesta del servidor.", "received");
@@ -85,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Eventos para el botón Enviar y la tecla Enter en el input
+  // Eventos para enviar mensaje al hacer clic en "Enviar" o presionar "Enter"
   sendBtn.addEventListener("click", sendMessage);
   msgInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") sendMessage();
