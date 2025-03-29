@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // REEMPLAZA las URL de ejemplo por las URL reales de tus productos.
   const keywordToUrlMapping = {
     // Objeto que mapea cada palabra clave a su respectiva URL de imagen
-const keywordToUrlMapping = {
+
   "ganoderma coffee": "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958440/GANODERMA-SOLUBLE-COFFEE_ptuzzd.jpg",
   "ganoderma soluble": "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958440/GANODERMA-SOLUBLE-COFFEE_ptuzzd.jpg",
   "café ganoderma": "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958440/GANODERMA-SOLUBLE-COFFEE_ptuzzd.jpg",
