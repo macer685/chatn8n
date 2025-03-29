@@ -61,6 +61,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("Mapping de palabras clave a URL:", keywordToUrlMapping);
 
+  // Función para escapar caracteres especiales en una cadena (para usarlos en regex)
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   /**
    * Transforma en el texto las palabras clave detectadas en formato Markdown de imagen,
    * agrupando los keywords por producto para evitar reemplazos duplicados.
@@ -76,9 +81,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Para cada producto, crear un regex que detecte cualquiera de sus keywords y reemplazar solo la primera ocurrencia.
-    // Si la keyword contiene espacios, no se añaden delimitadores de palabra.
     for (const [url, keywords] of Object.entries(productMapping)) {
-      const regexParts = keywords.map(k => k.includes(" ") ? k : `\\b${k}\\b`);
+      // Escapar las keywords y, si no contienen espacios, envolverlas en \b
+      const regexParts = keywords.map(k => k.includes(" ") ? escapeRegExp(k) : `\\b${escapeRegExp(k)}\\b`);
       const regex = new RegExp("(" + regexParts.join("|") + ")", "gi");
       let firstReplaced = false;
       text = text.replace(regex, (match) => {
@@ -121,7 +126,70 @@ document.addEventListener("DOMContentLoaded", () => {
       const imageUrl = match[2].trim();
       console.log("URL extraída:", imageUrl);
 
-      const img = document.create
+      const img = document.createElement("img");
+      img.src = imageUrl;
+      img.alt = match[1] || "Imagen";
+      img.style.maxWidth = "100%";
+      img.style.borderRadius = "8px";
+      img.style.marginTop = "5px";
+
+      img.onerror = () => {
+        console.error("Error al cargar la imagen:", imageUrl, "Cargando imagen de respaldo.");
+        img.onerror = null; // Desactivar onerror para evitar bucle
+        img.src = fallbackImageUrl;
+      };
+
+      messageElement.appendChild(img);
+      lastIndex = markdownImageRegex.lastIndex;
+    }
+
+    if (lastIndex < text.length) {
+      const remainingText = text.substring(lastIndex).trim();
+      if (remainingText) {
+        const textElement = document.createElement("p");
+        textElement.innerHTML = remainingText;
+        messageElement.appendChild(textElement);
+      }
+    }
+
+    messagesDiv.appendChild(messageElement);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  /**
+   * Envía el mensaje al servidor y muestra la respuesta.
+   */
+  async function sendMessage() {
+    const msg = msgInput.value.trim();
+    if (!msg) return;
+    addMessage(msg, "sent");
+    msgInput.value = "";
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mensaje: msg })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        addMessage(data.respuesta || "Sin respuesta", "received");
+      } else {
+        addMessage("Error en la respuesta del servidor.", "received");
+      }
+    } catch (error) {
+      addMessage("No se pudo conectar con el servidor.", "received");
+    }
+  }
+
+  // Eventos: se envía el mensaje al hacer clic en "Enviar" o al presionar Enter.
+  sendBtn.addEventListener("click", sendMessage);
+  msgInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  });
+});
 
 
 
