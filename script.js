@@ -5,40 +5,57 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById("sendBtn");
   const backBtn = document.getElementById("backBtn");
 
-  // Ejemplo simulado de datos obtenidos de la base de datos
-  // En producción, esta data se obtendrá dinámicamente del nodo "database"
-  const databaseData = [
-    {
-      producto: "Berry Coffee",
-      presentacion: "250g x 12 sachets",
-      palabrasClave: "berry coffee, café, arándano",
-      precio: "$50.00",
-      imagenUrl: "https://example.com/images/berry_coffee.jpg"
-    },
-    {
-      producto: "Ganoderma Soluble Coffee",
-      presentacion: "15gr x 12 sachets",
-      palabrasClave: "ganoderma coffee, soluble, café",
-      precio: "$87.40",
-      imagenUrl: "https://example.com/images/ganoderma_coffee.jpg"
-    },
-    {
-      producto: "Smart Watch",
-      presentacion: "1 unidad",
-      palabrasClave: "smart watch, reloj inteligente",
-      precio: "$120.00",
-      imagenUrl: "https://example.com/images/smart_watch.jpg"
-    }
-  ];
+  // Botón "Volver" que redirige al usuario a la página principal
+  backBtn.addEventListener("click", () => {
+    window.location.href = "https://www.macer.digital/";
+  });
+
+  // ============================================
+  // Aquí se debe obtener la data de la base de datos de forma dinámica.
+  // Por ejemplo, mediante un nodo de Google Sheets o una API.
+  // El formato esperado de cada registro es:
+  // {
+  //   producto: "Nombre del Producto",
+  //   presentacion: "Detalle de presentación",
+  //   palabrasClave: "palabra1, palabra2, ...",
+  //   precio: "Precio",
+  //   imagenUrl: "URL de la imagen"
+  // }
+  // Para propósitos de ejemplo, este bloque de datos está comentado:
+  //
+  // const databaseData = [
+  //   {
+  //     producto: "Berry Coffee",
+  //     presentacion: "250g x 12 sachets",
+  //     palabrasClave: "berry coffee, café, arándano",
+  //     precio: "$50.00",
+  //     imagenUrl: "https://example.com/images/berry_coffee.jpg"
+  //   },
+  //   {
+  //     producto: "Ganoderma Soluble Coffee",
+  //     presentacion: "15gr x 12 sachets",
+  //     palabrasClave: "ganoderma coffee, soluble, café",
+  //     precio: "$87.40",
+  //     imagenUrl: "https://example.com/images/ganoderma_coffee.jpg"
+  //   },
+  //   {
+  //     producto: "Smart Watch",
+  //     presentacion: "1 unidad",
+  //     palabrasClave: "smart watch, reloj inteligente",
+  //     precio: "$120.00",
+  //     imagenUrl: "https://example.com/images/smart_watch.jpg"
+  //   }
+  // ];
+  // ============================================
 
   /**
-   * Función que construye un mapeo de palabras clave a URL de imagen a partir de la data.
-   * Se espera que el campo "palabrasClave" tenga múltiples palabras separadas por comas.
+   * Función que construye automáticamente el mapeo de palabras clave a URL.
+   * Aquí se utiliza la data obtenida de la base de datos.
    */
   function buildKeywordMapping(data) {
     const mapping = {};
     data.forEach(item => {
-      // Separamos las palabras clave (y se convierten a minúsculas para búsqueda insensible)
+      // Separa las palabras clave y las normaliza a minúsculas
       const keywords = item.palabrasClave.split(",").map(kw => kw.trim().toLowerCase());
       keywords.forEach(keyword => {
         mapping[keyword] = item.imagenUrl;
@@ -47,8 +64,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return mapping;
   }
 
-  // Construimos el mapeo automáticamente a partir de la data de la base de datos.
-  const keywordToUrlMapping = buildKeywordMapping(databaseData);
+  // En producción, reemplaza el siguiente mapeo hardcodeado con la data real obtenida.
+  // Para propósitos de ejemplo, se simula el mapeo:
+  const keywordToUrlMapping = {
+    "berry coffee": "https://example.com/images/berry_coffee.jpg",
+    "ganoderma coffee": "https://example.com/images/ganoderma_coffee.jpg",
+    "smart watch": "https://example.com/images/smart_watch.jpg"
+  };
+
   console.log("Mapping de palabras clave a URL:", keywordToUrlMapping);
 
   /**
@@ -57,16 +80,12 @@ document.addEventListener("DOMContentLoaded", () => {
    * ![berry coffee](https://example.com/images/berry_coffee.jpg)
    */
   function transformKeywordsToUrls(text) {
-    // Convertimos el texto a minúsculas para la búsqueda de palabras clave
-    // (puedes ajustar esta lógica si deseas preservar el caso original)
     let transformedText = text;
     for (const keyword in keywordToUrlMapping) {
       const regex = new RegExp(`\\b${keyword}\\b`, "gi");
-      // Reemplazamos la palabra clave por la sintaxis Markdown de imagen
-      transformedText = transformedText.replace(
-        regex,
-        `![${keyword}](${keywordToUrlMapping[keyword]})`
-      );
+      transformedText = transformedText.replace(regex, (match) => {
+        return `![${match}](${keywordToUrlMapping[keyword]})`;
+      });
     }
     return transformedText;
   }
@@ -74,10 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
   /**
    * Agrega un mensaje al chat.
    * Primero transforma las palabras clave en formato Markdown, luego procesa el texto
-   * para detectar imágenes y mostrarlas.
+   * para detectar y mostrar imágenes.
    */
   function addMessage(text, type) {
-    // Transformamos el texto usando la función anterior.
+    // Transforma el texto usando la función anterior.
     text = transformKeywordsToUrls(text);
 
     const messageElement = document.createElement("div");
@@ -88,7 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let lastIndex = 0;
     let match;
 
-    // Procesamos todas las coincidencias (imágenes) en el texto
     while ((match = markdownImageRegex.exec(text)) !== null) {
       // Agrega el texto que aparece antes de la imagen (si existe)
       if (match.index > lastIndex) {
@@ -100,11 +118,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Extraemos y limpiamos la URL de la imagen
+      // Extrae y limpia la URL de la imagen
       const imageUrl = match[2].trim();
       console.log("URL extraída:", imageUrl);
 
-      // Creamos el elemento de imagen
+      // Crea el elemento de imagen
       const img = document.createElement("img");
       img.src = imageUrl;
       img.alt = match[1] || "Imagen";
@@ -124,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
       lastIndex = markdownImageRegex.lastIndex;
     }
 
-    // Agregar el texto restante después de la última imagen (si existe)
+    // Agrega el texto restante después de la última imagen (si existe)
     if (lastIndex < text.length) {
       const remainingText = text.substring(lastIndex).trim();
       if (remainingText) {
@@ -139,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Envía un mensaje al servidor y muestra la respuesta.
+   * Envía el mensaje al servidor y muestra la respuesta.
    */
   async function sendMessage() {
     const msg = msgInput.value.trim();
@@ -167,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Eventos para enviar mensaje
+  // Eventos para enviar mensajes
   sendBtn.addEventListener("click", sendMessage);
   msgInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
