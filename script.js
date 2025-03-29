@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "lactiberry":"https://res.cloudinary.com/dknm8qct5/image/upload/v1742958875/LACTIBERRY_gnzimc.jpg",
     "blueberry soybean milk drink":"https://res.cloudinary.com/dknm8qct5/image/upload/v1742958245/BLUEBERRY-SOYBEAN-MILK-DRINK-HGW-v001_tr97ph.jpg",
     "blueberry fruit tea (jam)":"https://res.cloudinary.com/dknm8qct5/image/upload/v1743190150/blueberry_fruit_e3jpzc.jpg",
-    "toalla sanitaria dia";"https://res.cloudinary.com/dknm8qct5/image/upload/v1743094789/toalla-higienica-dia-600x585_tccg7s.png"
+    "toalla sanitaria dia":"https://res.cloudinary.com/dknm8qct5/image/upload/v1743094789/toalla-higienica-dia-600x585_tccg7s.png"
   };
 
   // URL de respaldo en caso de error (por ejemplo, error 404)
