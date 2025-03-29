@@ -19,54 +19,65 @@ document.addEventListener("DOMContentLoaded", () => {
     messageElement.classList.add("chat-message", type);
 
     // Expresión regular mejorada para detectar imágenes en formato Markdown
-    const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\)]+)\)/gi;
+    // Captura el texto alternativo y la URL (deteniendo en el primer espacio o ')')
+    const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/gi;
+    const matches = Array.from(text.matchAll(markdownImageRegex));
     let lastIndex = 0;
-    let match;
 
-    // Procesar todas las coincidencias
-    while ((match = markdownImageRegex.exec(text)) !== null) {
-      // Agregar el texto que aparece antes de la imagen
-      if (match.index > lastIndex) {
-        const textFragment = text.substring(lastIndex, match.index).trim();
-        if (textFragment) {
+    if (matches.length > 0) {
+      // Iteramos sobre cada coincidencia
+      for (const match of matches) {
+        // Agregar texto que aparezca antes de la imagen
+        if (match.index > lastIndex) {
+          const textFragment = text.substring(lastIndex, match.index).trim();
+          if (textFragment) {
+            const textElement = document.createElement("p");
+            textElement.innerHTML = textFragment;
+            messageElement.appendChild(textElement);
+          }
+        }
+
+        // Extraer y limpiar la URL
+        let imageUrl = match[2].trim();
+        // Decodificar la URL en caso de estar codificada
+        imageUrl = decodeURI(imageUrl);
+        console.log("URL extraída:", imageUrl);
+
+        // Crear la imagen
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.alt = match[1] || "Imagen";
+        img.style.maxWidth = "100%";
+        img.style.borderRadius = "8px";
+        img.style.marginTop = "5px";
+
+        // Manejo de error en la carga de la imagen
+        img.onerror = () => {
+          const errorMsg = document.createElement("p");
+          errorMsg.textContent = "No se pudo cargar la imagen.";
+          errorMsg.style.color = "red";
+          messageElement.appendChild(errorMsg);
+        };
+
+        messageElement.appendChild(img);
+        // Actualizar el índice para el siguiente fragmento
+        lastIndex = match.index + match[0].length;
+      }
+
+      // Agregar el texto restante después de la última imagen
+      if (lastIndex < text.length) {
+        const remainingText = text.substring(lastIndex).trim();
+        if (remainingText) {
           const textElement = document.createElement("p");
-          textElement.innerHTML = textFragment;
+          textElement.innerHTML = remainingText;
           messageElement.appendChild(textElement);
         }
       }
-
-      // Extraer y limpiar la URL
-      const imageUrl = match[2].trim();
-      console.log("URL extraída:", imageUrl);
-
-      // Crear la imagen
-      const img = document.createElement("img");
-      img.src = imageUrl;
-      img.alt = match[1] || "Imagen";
-      img.style.maxWidth = "100%";
-      img.style.borderRadius = "8px";
-      img.style.marginTop = "5px";
-
-      // Manejo de error en la carga de la imagen
-      img.onerror = () => {
-        const errorMsg = document.createElement("p");
-        errorMsg.textContent = "No se pudo cargar la imagen.";
-        errorMsg.style.color = "red";
-        messageElement.appendChild(errorMsg);
-      };
-
-      messageElement.appendChild(img);
-      lastIndex = markdownImageRegex.lastIndex;
-    }
-
-    // Agregar el texto restante después de la última imagen (si existe)
-    if (lastIndex < text.length) {
-      const remainingText = text.substring(lastIndex).trim();
-      if (remainingText) {
-        const textElement = document.createElement("p");
-        textElement.innerHTML = remainingText;
-        messageElement.appendChild(textElement);
-      }
+    } else {
+      // Si no se detecta formato Markdown para imagen, muestra el texto completo
+      const textElement = document.createElement("p");
+      textElement.innerHTML = text;
+      messageElement.appendChild(textElement);
     }
 
     messagesDiv.appendChild(messageElement);
@@ -80,7 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const msg = msgInput.value.trim();
     if (!msg) return;
 
-    // Agregar el mensaje enviado
     addMessage(msg, "sent");
     msgInput.value = "";
 
