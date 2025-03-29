@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     messageElement.classList.add("chat-message", type);
 
     // Expresión regular para detectar imágenes en formato Markdown
-    const markdownImageRegex = /!\[.*?\]\((https?:\/\/.*?\.(?:png|jpg|jpeg|gif|webp))\)/gi;
+    const markdownImageRegex = /!\[.*?\]\((.*?)\)/gi;
     let lastIndex = 0;
     let match;
 
@@ -40,8 +40,16 @@ document.addEventListener("DOMContentLoaded", () => {
       img.style.maxWidth = "100%";
       img.style.borderRadius = "8px";
       img.style.marginTop = "5px";
-      messageElement.appendChild(img);
 
+      // Manejo de errores en la carga de la imagen
+      img.onerror = () => {
+        const errorMsg = document.createElement("p");
+        errorMsg.textContent = "No se pudo cargar la imagen.";
+        errorMsg.style.color = "red";
+        messageElement.appendChild(errorMsg);
+      };
+
+      messageElement.appendChild(img);
       lastIndex = markdownImageRegex.lastIndex;
     }
 
@@ -68,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     addMessage(msg, "sent");
     msgInput.value = "";
-    
+
     try {
       const response = await fetch(webhookUrl, {
         method: "POST",
