@@ -49,11 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
     "infusión de frutas": "https://res.cloudinary.com/dknm8qct5/image/upload/v1743190150/blueberry_fruit_e3jpzc.jpg",
     "toalla sanitaria día": "https://res.cloudinary.com/dknm8qct5/image/upload/v1743094789/toalla-higienica-dia-600x585_tccg7s.png",
     "compresa femenina día": "https://res.cloudinary.com/dknm8qct5/image/upload/v1743094789/toalla-higienica-dia-600x585_tccg7s.png",
-    // Completa la URL de este producto o elimínalo si no lo usas
     "protección femenina diaria": "https://res.cloudinary.com/dknm8qct5/image/upload/vXXXXXX/proteccion-femenina.jpg"
   };
-  };
-
   // URL de respaldo en caso de error (por ejemplo, error 404)
   const fallbackImageUrl = "https://tu-dominio.com/imagenes/fallback.jpg";
 
