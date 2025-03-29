@@ -49,9 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "infusión de frutas": "https://res.cloudinary.com/dknm8qct5/image/upload/v1743190150/blueberry_fruit_e3jpzc.jpg",
     "toalla sanitaria día": "https://res.cloudinary.com/dknm8qct5/image/upload/v1743094789/toalla-higienica-dia-600x585_tccg7s.png",
     "compresa femenina día": "https://res.cloudinary.com/dknm8qct5/image/upload/v1743094789/toalla-higienica-dia-600x585_tccg7s.png",
-    "protección femenina diaria": "https://res.cloudinary.com/dknm8qct5/image/upload/vXXXXXX/proteccion-femenina.jpg"
-
-    
+    "protección femenina diaria": "https://res.cloudinary.com/dknm8qct5/image/upload/vXXXXXX/proteccion-femenina.jpg",
     "toalla sanitaria noche": "https://res.cloudinary.com/dknm8qct5/image/upload/v1742959554/toallas_varias_xripi6.webp",
     "protector diario": "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958957/PROTECTOR-DE-USO-DIARIO-HGW-v.001-final-_q0tglu.jpg",
     "Pasta de dientes Green World Herbs": "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958366/crema_dental_umniaj.jpg",
