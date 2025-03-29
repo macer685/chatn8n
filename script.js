@@ -49,8 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
     "infusión de frutas": "https://res.cloudinary.com/dknm8qct5/image/upload/v1743190150/blueberry_fruit_e3jpzc.jpg",
     "toalla sanitaria día": "https://res.cloudinary.com/dknm8qct5/image/upload/v1743094789/toalla-higienica-dia-600x585_tccg7s.png",
     "compresa femenina día": "https://res.cloudinary.com/dknm8qct5/image/upload/v1743094789/toalla-higienica-dia-600x585_tccg7s.png",
-    // Asegúrate de completar o corregir la URL del siguiente producto
-    "protección femenina diaria": "https://res.cloudinary.com/dknm8qct5/image/upload/..." 
+    // Completa la URL de este producto o elimínalo si no lo usas
+    "protección femenina diaria": "https://res.cloudinary.com/dknm8qct5/image/upload/vXXXXXX/proteccion-femenina.jpg"
   };
 
   // URL de respaldo en caso de error (por ejemplo, error 404)
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let lastIndex = 0;
     let match;
 
-    // Separa el texto en segmentos que sean imágenes y no imágenes
+    // Separa el texto en segmentos que sean imágenes y segmentos que no lo sean
     while ((match = markdownImageRegex.exec(text)) !== null) {
       if (match.index > lastIndex) {
         segments.push({
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Para cada segmento que NO sea imagen, se aplica la transformación
+    // Para cada segmento que NO sea imagen, aplicar la transformación
     const keywords = Object.keys(keywordToUrlMapping).sort((a, b) => b.length - a.length);
     segments = segments.map(segment => {
       if (!segment.isImage) {
@@ -109,11 +109,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * Agrega un mensaje al chat.
-   * Primero transforma el texto, reemplazando palabras clave por Markdown de imagen,
-   * luego procesa el mensaje para detectar y mostrar las imágenes.
+   * Transforma el texto, reemplazando palabras clave por Markdown de imagen,
+   * y luego procesa el mensaje para detectar y mostrar las imágenes.
    */
   function addMessage(text, type) {
-    // Transformar el mensaje (aplicando la función solo a segmentos que no sean ya imágenes)
+    // Aplica la transformación solo a los segmentos que no son ya imágenes
     text = transformKeywordsToUrls(text);
 
     const messageElement = document.createElement("div");
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let lastIndex = 0;
     let match;
 
-    // Procesa cada coincidencia (imagen) en el mensaje
+    // Procesa cada coincidencia de imagen en el mensaje
     while ((match = markdownImageRegex.exec(text)) !== null) {
       if (match.index > lastIndex) {
         const textFragment = text.substring(lastIndex, match.index).trim();
@@ -159,6 +159,48 @@ document.addEventListener("DOMContentLoaded", () => {
       if (remainingText) {
         const textElement = document.createElement("p");
         textElement.innerHTML = remainingText;
+        messageElement.appendChild(textElement);
+      }
+    }
+
+    messagesDiv.appendChild(messageElement);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  /**
+   * Envía el mensaje al servidor y muestra la respuesta.
+   */
+  async function sendMessage() {
+    const msg = msgInput.value.trim();
+    if (!msg) return;
+    addMessage(msg, "sent");
+    msgInput.value = "";
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mensaje: msg })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        addMessage(data.respuesta || "Sin respuesta", "received");
+      } else {
+        addMessage("Error en la respuesta del servidor.", "received");
+      }
+    } catch (error) {
+      addMessage("No se pudo conectar con el servidor.", "received");
+    }
+  }
+
+  // Eventos: se envía el mensaje al hacer clic en el botón "Enviar" o al presionar Enter.
+  sendBtn.addEventListener("click", sendMessage);
+  msgInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  });
+});
 
 
 
