@@ -124,9 +124,11 @@ document.addEventListener("DOMContentLoaded", () => {
       img.style.marginTop = "5px";
 
       img.onerror = () => {
-        console.error("Error al cargar la imagen:", imageUrl, "Cargando imagen de respaldo.");
-        img.src = fallbackImageUrl;
-      };
+  console.error("Error al cargar la imagen:", imageUrl, "Cargando imagen de respaldo.");
+  // Desactivar onerror para evitar el bucle
+  img.onerror = null;
+  img.src = fallbackImageUrl;
+};
 
       messageElement.appendChild(img);
       lastIndex = markdownImageRegex.lastIndex;
