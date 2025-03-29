@@ -1,35 +1,83 @@
 document.addEventListener("DOMContentLoaded", () => {
   // URL del webhook para el agente (n8n)
   const webhookUrl = "https://macercreative.app.n8n.cloud/webhook/chat";
-  
+
   // Selección de elementos del DOM
   const messagesDiv = document.getElementById("messages");
   const msgInput = document.getElementById("msgInput");
   const sendBtn = document.getElementById("sendBtn");
   const backBtn = document.getElementById("backBtn");
 
-  // Botón "Volver" que redirige a la página principal
+  // Botón "Volver": redirige a la página principal
   backBtn.addEventListener("click", () => {
     window.location.href = "https://www.macer.digital/";
   });
 
+  // ============================================================
+  // NOTA: En producción, debes obtener los datos de la base de datos (por ejemplo, Google Sheets)
+  // con el siguiente formato:
+  // {
+  //   producto: "Nombre del Producto",
+  //   presentacion: "Detalle de presentación",
+  //   palabrasClave: "palabra1, palabra2, ...",
+  //   precio: "Precio",
+  //   imagenUrl: "URL de la imagen"
+  // }
+  // Este objeto simulado se usa solo para pruebas.
+  // ============================================================
+  // REEMPLAZA las URL de ejemplo por las URL reales de tus productos.
+  const keywordToUrlMapping = {
+    "ganoderma coffee": "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958440/GANODERMA-SOLUBLE-COFFEE_ptuzzd.jpg",
+    "berry coffee": "https://res.cloudinary.com/dknm8qct5/image/upload/v1742954477/Berry-Gano-Coffee-v.001-final_yt0ytj.jpg",
+    "smart watch": "https://res.cloudinary.com/dknm8qct5/image/upload/v1743112350/reloj_bbcz1j.jpg"
+  };
+
+  // URL de respaldo en caso de error (por ejemplo, error 404)
+  const fallbackImageUrl = "https://tu-dominio.com/imagenes/fallback.jpg";
+
+  console.log("Mapping de palabras clave a URL:", keywordToUrlMapping);
+
+  /**
+   * Transforma en el texto las palabras clave detectadas en formato Markdown de imagen,
+   * priorizando las coincidencias más específicas (las de mayor longitud).
+   *
+   * Ejemplo: "ganoderma coffee" se transforma en:
+   *   ![ganoderma coffee](https://tu-dominio.com/imagenes/ganoderma_coffee.jpg)
+   */
+  function transformKeywordsToUrls(text) {
+    let transformedText = text;
+    // Ordenar las claves de mayor a menor longitud para priorizar coincidencias específicas
+    const keywords = Object.keys(keywordToUrlMapping).sort((a, b) => b.length - a.length);
+    keywords.forEach(keyword => {
+      // Creamos una expresión regular para buscar la palabra completa, sin importar mayúsculas/minúsculas
+      const regex = new RegExp(`\\b${keyword}\\b`, "gi");
+      transformedText = transformedText.replace(regex, (match) => {
+        console.log(`Reemplazando "${match}" por: ![${match}](${keywordToUrlMapping[keyword]})`);
+        return `![${match}](${keywordToUrlMapping[keyword]})`;
+      });
+    });
+    console.log("Texto transformado:", transformedText);
+    return transformedText;
+  }
+
   /**
    * Agrega un mensaje al chat.
-   * Este código detecta el formato Markdown de imagen y crea elementos <img>.
-   * Para que se muestre la imagen, el usuario debe ingresar la URL en formato Markdown.
-   *
-   * Ejemplo de formato correcto:
-   *   ![Nombre del producto](https://example.com/imagen.jpg)
+   * Primero transforma el texto, reemplazando palabras clave por Markdown de imagen.
+   * Luego, procesa el mensaje para detectar y mostrar las imágenes.
    */
   function addMessage(text, type) {
+    // Transforma el mensaje: si el usuario ingresa palabras clave, se convierten a formato Markdown.
+    text = transformKeywordsToUrls(text);
+
     const messageElement = document.createElement("div");
     messageElement.classList.add("chat-message", type);
 
-    // Expresión regular para detectar imágenes en formato Markdown
+    // Expresión regular para detectar imágenes en formato Markdown: ![Texto](URL)
     const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/gi;
     let lastIndex = 0;
     let match;
 
+    // Procesa cada coincidencia (imagen) en el mensaje
     while ((match = markdownImageRegex.exec(text)) !== null) {
       // Agrega el texto que aparece antes de la imagen (si existe)
       if (match.index > lastIndex) {
@@ -41,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Extrae la URL de la imagen y la limpia
+      // Extrae y limpia la URL de la imagen
       const imageUrl = match[2].trim();
       console.log("URL extraída:", imageUrl);
 
@@ -53,19 +101,17 @@ document.addEventListener("DOMContentLoaded", () => {
       img.style.borderRadius = "8px";
       img.style.marginTop = "5px";
 
-      // Manejo de error en la carga de la imagen
+      // Si la imagen falla (por ejemplo, error 404), se carga la imagen de respaldo
       img.onerror = () => {
-        const errorMsg = document.createElement("p");
-        errorMsg.textContent = "No se pudo cargar la imagen.";
-        errorMsg.style.color = "red";
-        messageElement.appendChild(errorMsg);
+        console.error("Error al cargar la imagen:", imageUrl, "Cargando imagen de respaldo.");
+        img.src = fallbackImageUrl;
       };
 
       messageElement.appendChild(img);
       lastIndex = markdownImageRegex.lastIndex;
     }
 
-    // Agrega el texto restante, si existe
+    // Agrega cualquier texto restante después de la última imagen
     if (lastIndex < text.length) {
       const remainingText = text.substring(lastIndex).trim();
       if (remainingText) {
@@ -85,8 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
   async function sendMessage() {
     const msg = msgInput.value.trim();
     if (!msg) return;
-
-    // Muestra el mensaje enviado por el usuario
     addMessage(msg, "sent");
     msgInput.value = "";
 
@@ -96,7 +140,6 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mensaje: msg })
       });
-
       if (response.ok) {
         const data = await response.json();
         addMessage(data.respuesta || "Sin respuesta", "received");
@@ -108,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Eventos para enviar mensajes: botón "Enviar" y tecla "Enter"
+  // Eventos: se envía el mensaje al hacer clic en el botón "Enviar" o al presionar Enter.
   sendBtn.addEventListener("click", sendMessage);
   msgInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
