@@ -166,6 +166,29 @@ document.addEventListener("DOMContentLoaded", () => {
       addMessage("No se pudo conectar con el servidor.", "received");
     }
   }
+  // NUEVO: Función para mostrar un mensaje de bienvenida animado
+function showWelcomeMessage() {
+  const messagesDiv = document.getElementById("messages");
+  const welcome = document.createElement("div");
+  welcome.classList.add("welcome-message");
+  welcome.textContent = "¡Bienvenido al Chat! ¿Listo para comenzar?";
+  messagesDiv.appendChild(welcome);
+  // Se elimina el mensaje después de 4 segundos (duración de la animación)
+  setTimeout(() => {
+    welcome.remove();
+  }, 4000);
+}
+
+// Llama a la función de bienvenida al iniciar (después de cargar el DOM y configurar tus listeners)
+document.addEventListener("DOMContentLoaded", () => {
+  // ... tu código existente ...
+  
+  // Llama al mensaje de bienvenida
+  showWelcomeMessage();
+  
+  // ... el resto de tu código ...
+});
+
 
   // Enviar mensaje al hacer clic o presionar Enter
   sendBtn.addEventListener("click", sendMessage);
