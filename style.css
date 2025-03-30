@@ -102,7 +102,13 @@ body {
     font-size: 0.9em;
     padding: 6px 10px;
   }
-  /* ANIMACIONES NUEVAS */
+  /* Si es necesario reducir aún más la altura del chat en móviles */
+  #chatContainer {
+    height: calc(100vh - 100px);
+  }
+}
+
+/* ANIMACIONES NUEVAS */
 
 /* Keyframes para la animación del contenedor del chat */
 @keyframes fadeInSlide {
@@ -151,11 +157,5 @@ body {
   text-align: center;
   margin-bottom: 10px;
   font-weight: bold;
-}
-
-  /* Si es necesario reducir aún más la altura del chat en móviles */
-  #chatContainer {
-    height: calc(100vh - 100px);
-  }
 }
 
