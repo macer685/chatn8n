@@ -171,9 +171,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function showWelcomeMessage() {
     const welcome = document.createElement("div");
     welcome.classList.add("welcome-message");
-    welcome.textContent = "¡HGW,Cuida tu Salud!,Bienbenidos";
+    welcome.textContent = "¡PRODUCTOS DE LA MEJOR CALIDAD Y SALUDABLES!";
     messagesDiv.appendChild(welcome);
-    // Se elimina el mensaje después de 4 segundos (duración de la animación)
+    // Se elimina el mensaje después de 5 segundos (duración de la animación)
     setTimeout(() => {
       welcome.remove();
     }, 5000);
