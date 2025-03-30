@@ -1,29 +1,46 @@
-/* Estilos generales y responsivos */
-body {
+/* Reset básico y box-sizing */
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+  padding: 0;
 }
 
+/* Aseguramos que html y body ocupen el 100% de la altura */
+html, body {
+  height: 100%;
+}
+
+/* Estilos para el body: centrado vertical y horizontal */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f5f5f5;
+  font-family: Arial, sans-serif;
+  padding: 20px; /* margen interno para dispositivos pequeños */
+}
+
+/* Contenedor del chat */
 #chatContainer {
   display: flex;
   flex-direction: column;
+  width: 100%;
   max-width: 800px;
-  margin: 0 auto;
   background: #fff;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  flex: 1;
+  /* Se establece una altura dinámica: 100vh menos 100px para evitar problemas en móviles */
+  height: calc(100vh - 100px);
+  margin: 0 auto;
 }
 
+/* Área de mensajes */
 #messages {
   flex: 1;
   padding: 10px;
   overflow-y: auto;
 }
 
+/* Mensajes individuales */
 .chat-message {
   margin-bottom: 10px;
   padding: 8px;
@@ -42,6 +59,7 @@ body {
   align-self: flex-start;
 }
 
+/* Contenedor de entrada y botones */
 #inputContainer {
   display: flex;
   padding: 10px;
@@ -58,6 +76,7 @@ body {
   margin-right: 5px;
 }
 
+/* Botones */
 #sendBtn, #backBtn {
   padding: 8px 12px;
   font-size: 1em;
@@ -77,10 +96,15 @@ body {
   color: #fff;
 }
 
+/* Ajustes responsivos para pantallas pequeñas */
 @media (max-width: 600px) {
   #sendBtn, #backBtn {
     font-size: 0.9em;
     padding: 6px 10px;
+  }
+  /* Si es necesario reducir aún más la altura del chat en móviles */
+  #chatContainer {
+    height: calc(100vh - 100px);
   }
 }
 
