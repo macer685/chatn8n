@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // URL del webhook para el agente (n8n)
+  // Webhook de n8n para el chat
   const webhookUrl = "https://macercreative.app.n8n.cloud/webhook/chat";
 
   // Elementos del DOM
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "https://www.macer.digital/";
   });
 
-  // Array de URLs de referencia (las que funcionan correctamente)
+  // Array de URLs de referencia "buenas" (las que están en la base de datos)
   let goodUrls = [
     "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958440/GANODERMA-SOLUBLE-COFFEE_ptuzzd.jpg",
     "https://res.cloudinary.com/dknm8qct5/image/upload/v1742954477/Berry-Gano-Coffee-v.001-final_yt0ytj.jpg",
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return maxLen === 0 ? 1 : 1 - distance / maxLen;
   }
 
-  // Función para corregir la URL usando las URLs buenas
+  // Función para corregir la URL usando las URLs "buenas"
   function fixUrl(newUrl) {
     const newProductName = extractProductName(newUrl);
     const newVersion = getVersion(newUrl);
@@ -84,41 +84,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (bestScore > 0.6 && bestMatch) {
       const correctVersion = getVersion(bestMatch);
+      // Reemplaza la versión en la URL nueva por la versión correcta
       return newUrl.replace(newVersion, correctVersion);
     }
     return newUrl;
   }
 
-  // Función para obtener datos de Google Sheets (debe estar publicada como API en Apps Script)
-  async function getSheetData() {
-    try {
-      const sheetUrl = "https://script.google.com/macros/s/TU_SCRIPT_ID/exec"; // Reemplaza con tu URL pública
-      const response = await fetch(sheetUrl);
-      if (!response.ok) throw new Error("Error al obtener datos de la hoja");
-      const data = await response.json();
-      return data; // Se espera que sea un array de objetos con la propiedad 'url'
-    } catch (error) {
-      console.error("Error en getSheetData:", error);
-      return [];
-    }
-  }
-
-  // Ejemplo: Actualiza goodUrls con los datos de la hoja (si lo deseas)
-  getSheetData().then(sheetData => {
-    if (sheetData.length > 0) {
-      // Si cada registro tiene una propiedad 'url', podrías reemplazar goodUrls así:
-      goodUrls = sheetData.map(item => item.url);
-      console.log("Good URLs actualizadas desde la hoja:", goodUrls);
-    }
-  });
-
-  // Función para agregar un mensaje al chat, procesando Markdown para imágenes y corrigiendo URLs
+  // Función para agregar mensajes al chat y procesar Markdown para imágenes
   function addMessage(text, type) {
     const messageElement = document.createElement("div");
     messageElement.classList.add("chat-message", type);
-    const markdownImageRegex = /!\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+)\\)/gi;
-    let lastIndex = 0, match;
+
+    // Expresión regular para detectar imágenes en formato Markdown: ![alt](url)
+    const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/gi;
+    let lastIndex = 0;
+    let match;
+
     while ((match = markdownImageRegex.exec(text)) !== null) {
+      // Si hay texto previo, se agrega como párrafo
       if (match.index > lastIndex) {
         const textFragment = text.substring(lastIndex, match.index).trim();
         if (textFragment) {
@@ -127,6 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
           messageElement.appendChild(textElement);
         }
       }
+      // Se procesa la URL de la imagen para corregirla si es necesario
       let imageUrl = fixUrl(match[2].trim());
       console.log("URL procesada:", imageUrl);
       const img = document.createElement("img");
@@ -135,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
       img.style.maxWidth = "100%";
       img.style.borderRadius = "8px";
       img.style.marginTop = "5px";
+      // Fallback en caso de error al cargar la imagen
       img.dataset.errorHandled = "false";
       img.onerror = function() {
         if (this.dataset.errorHandled === "false") {
@@ -145,6 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
       messageElement.appendChild(img);
       lastIndex = markdownImageRegex.lastIndex;
     }
+    // Si queda texto residual después de procesar imágenes
     if (lastIndex < text.length) {
       const remainingText = text.substring(lastIndex).trim();
       if (remainingText) {
@@ -157,6 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 
+  // Función para enviar el mensaje al webhook de n8n
   async function sendMessage() {
     const msg = msgInput.value.trim();
     if (!msg) return;
@@ -170,6 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       if (response.ok) {
         const data = await response.json();
+        // Se espera que la respuesta incluya 'respuesta' (puede incluir texto y/o markdown con imágenes)
         addMessage(data.respuesta || "Sin respuesta", "received");
       } else {
         addMessage("Error en la respuesta del servidor.", "received");
@@ -179,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Enviar mensaje al hacer clic o presionar Enter
   sendBtn.addEventListener("click", sendMessage);
   msgInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
@@ -186,6 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
 
 
 
