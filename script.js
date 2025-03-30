@@ -15,10 +15,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Array de URLs de referencia "buenas" (las que están en la base de datos)
   let goodUrls = [
-    "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958440/GANODERMA-SOLUBLE-COFFEE_ptuzzd.jpg",
-    "https://res.cloudinary.com/dknm8qct5/image/upload/v1742954477/Berry-Gano-Coffee-v.001-final_yt0ytj.jpg",
-    "https://res.cloudinary.com/dknm8qct5/image/upload/v1743112350/reloj_bbcz1j.jpg",
-    "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958789/JABON-DE-OLIVA-CON-ACEITE-NATURAL_ayp0tm.jpg"
+    
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1742958440/GANODERMA-SOLUBLE-COFFEE_ptuzzd.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743375214/cafe_con_antioxidantes_o71ukh.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743375038/cafe_con_te_negro_gpzgsr.png",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743374862/dulces_de_arandano_cpu5wx.jpg"
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1742958875/LACTIBERRY_gnzimc.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743374645/bebida_de_leche_de_soja_y_arandanos_emoqt1.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743374425/mermelada_de_arandanos_xxxafu.jpgg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743374041/toalla_sanitaria_dia_dhmima.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743374199/toalla_sanitaria_noche_p1lk3u.webp",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1742958957/PROTECTOR-DE-USO-DIARIO-HGW-v.001-final-_q0tglu.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1742958366/crema_dental_umniaj.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1742958789/JABON-DE-OLIVA-CON-ACEITE-NATURAL_ayp0tm.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1742958676/jabon_de_tourmalina_mejmca.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1742959103/shower_gel_mc43eu.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1742959047/Shampoo-de-Keratina_xzv3uk.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743373491/Gel_de_esencia_de_disparo_Mingdeshijia_HGW_ngqahb.webp",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743373326/Crema_de_manos_de_miel_y_arandanos_Smilife_iaq9qt.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743364495/collar_de_tourmalina_version_ltda_xymuvc.webp",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743364495/collar_de_tourmalina_version_ltda_xymuvc.webp",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743364054/pulsera_de_tourmalina_ltda_k5qdnx.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743372976/pulsera_de_tourmalina_jbcyts.webp",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743107137/u%C3%B1as_rqdbae.webp",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743372589/colgante_piedra_energetica_amvbyd.webp",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743364331/u%C3%B1as_postizas_93-105_h9ks2r.avif",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743372138/plantillas_de_tourmalina_qcnty6.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743371956/protector_cuello_autocalentable_t6ufof.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743371825/protector_cintura_autocalentable_kesjr5.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743371524/Kit_smilife_arandano_kit_cosmeticos_smilife_rkpk0i.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743370994/smilife_blueberry_limpieza_facial_vrucx4.png",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743370487/locion_de_arandanos_smilee_humectante_n7zmt5.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743111001/humectante-facial-crema_t67rgx.png",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743366222/Tonico_facial_de_arandanos_Smilife_zq4jfz.webp",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743366021/crema_arandanos_smilee_contorno_de_ojos_uzwyrb.webp",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743366896/esencia_de_arandanos_smilee_facial_gw4qdq.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743365760/turmalina_termica_Whaterson_qeciuw.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743367402/aerosol_desinfectante_portatil_yrqgr0.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743364825/generador_de_ozono_digital_para_uso_domestico_c0qt4t.jpg",
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743364699/reloj_inteligente_smart_whatch_kn9hdm.jpg"
   ];
 
   // Función para extraer el nombre del producto de la URL
