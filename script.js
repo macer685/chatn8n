@@ -171,12 +171,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function showWelcomeMessage() {
     const welcome = document.createElement("div");
     welcome.classList.add("welcome-message");
-    welcome.textContent = "¡Bienvenido al Chat! ¿Listo para comenzar?";
+    welcome.textContent = "¡HGW,Cuida tu Salud!,Bienbenidos";
     messagesDiv.appendChild(welcome);
     // Se elimina el mensaje después de 4 segundos (duración de la animación)
     setTimeout(() => {
       welcome.remove();
-    }, 4000);
+    }, 5000);
   }
 
   // Llamadas de configuración y listeners
