@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958440/GANODERMA-SOLUBLE-COFFEE_ptuzzd.jpg",
 "https://res.cloudinary.com/dknm8qct5/image/upload/v1743375214/cafe_con_antioxidantes_o71ukh.jpg",
 "https://res.cloudinary.com/dknm8qct5/image/upload/v1743375038/cafe_con_te_negro_gpzgsr.png",
-"https://res.cloudinary.com/dknm8qct5/image/upload/v1743374862/dulces_de_arandano_cpu5wx.jpg"
+"https://res.cloudinary.com/dknm8qct5/image/upload/v1743374862/dulces_de_arandano_cpu5wx.jpg",
 "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958875/LACTIBERRY_gnzimc.jpg",
 "https://res.cloudinary.com/dknm8qct5/image/upload/v1743374645/bebida_de_leche_de_soja_y_arandanos_emoqt1.jpg",
 "https://res.cloudinary.com/dknm8qct5/image/upload/v1743374425/mermelada_de_arandanos_xxxafu.jpgg",
