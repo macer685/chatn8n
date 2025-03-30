@@ -9,48 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "https://www.macer.digital/";
   });
 
-  const goodUrls = [
-    "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958440/GANODERMA-SOLUBLE-COFFEE_ptuzzd.jpg",
-    "https://res.cloudinary.com/dknm8qct5/image/upload/v1742954477/Berry-Gano-Coffee-v.001-final_yt0ytj.jpg",
-    "https://res.cloudinary.com/dknm8qct5/image/upload/v1743112350/reloj_bbcz1j.jpg",
-    "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958789/JABON-DE-OLIVA-CON-ACEITE-NATURAL_ayp0tm.jpg"
-  ];
-
-  function extractProductName(url) {
-    const match = url.match(/v\d+\/([^.]+)[._-]/);
-    return match ? match[1].toLowerCase().replace(/[-_]/g, ' ') : null;
-  }
-
-  function getVersion(url) {
-    const match = url.match(/(v\d+)\//);
-    return match ? match[1] : null;
-  }
-
-  function similarity(str1, str2) {
-    let matchCount = 0;
-    const minLength = Math.min(str1.length, str2.length);
-    for (let i = 0; i < minLength; i++) {
-      if (str1[i] === str2[i]) matchCount++;
-    }
-    return matchCount / Math.max(str1.length, str2.length);
-  }
-
-  function fixUrl(newUrl) {
-    const newProductName = extractProductName(newUrl);
-    const newVersion = getVersion(newUrl);
-    let bestMatch = null;
-    let bestScore = 0.0;
-    for (const goodUrl of goodUrls) {
-      const goodProductName = extractProductName(goodUrl);
-      const score = similarity(newProductName, goodProductName);
-      if (score > bestScore) {
-        bestScore = score;
-        bestMatch = goodUrl;
-      }
-    }
-    return bestScore > 0.6 && bestMatch ? newUrl.replace(newVersion, getVersion(bestMatch)) : newUrl;
-  }
-
   async function sendMessage() {
     const msg = msgInput.value.trim();
     if (!msg) return;
@@ -88,14 +46,19 @@ document.addEventListener("DOMContentLoaded", () => {
           messageElement.appendChild(textElement);
         }
       }
-      let imageUrl = fixUrl(match[2].trim());
       const img = document.createElement("img");
-      img.src = imageUrl;
+      img.src = match[2].trim();
       img.alt = match[1] || "Imagen";
       img.style.maxWidth = "100%";
       img.style.borderRadius = "8px";
       img.style.marginTop = "5px";
-      img.onerror = () => { img.src = "https://tu-dominio.com/imagenes/fallback.jpg"; };
+      img.dataset.failed = "false";
+      img.onerror = function () {
+        if (this.dataset.failed === "false") {
+          this.dataset.failed = "true";
+          this.src = "https://tu-dominio.com/imagenes/fallback.jpg";
+        }
+      };
       messageElement.appendChild(img);
       lastIndex = markdownImageRegex.lastIndex;
     }
