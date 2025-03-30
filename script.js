@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const testUrl = "https://res.cloudinary.com/dknm8qct5/image/upload/v1742987654/JABON-DE-OLIVA-CON-ACEITE-NATURAL_xy9l4m.jpg";
   console.log("URL corregida:", fixUrl(testUrl));
-});
+
 
   // URL de respaldo en caso de error (por ejemplo, error 404)
   const fallbackImageUrl = "https://tu-dominio.com/imagenes/fallback.jpg";
