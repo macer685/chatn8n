@@ -102,6 +102,57 @@ body {
     font-size: 0.9em;
     padding: 6px 10px;
   }
+  /* ANIMACIONES NUEVAS */
+
+/* Keyframes para la animación del contenedor del chat */
+@keyframes fadeInSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Clase para aplicar la animación al contenedor del chat */
+.animate-chat {
+  animation: fadeInSlide 0.8s ease-out forwards;
+}
+
+/* Keyframes para el mensaje de bienvenida */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* Clase para el mensaje de bienvenida */
+.welcome-message {
+  animation: fadeInOut 4s ease-in-out forwards;
+  background: #007bff;
+  color: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
   /* Si es necesario reducir aún más la altura del chat en móviles */
   #chatContainer {
     height: calc(100vh - 100px);
