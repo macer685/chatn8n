@@ -156,6 +156,55 @@ document.addEventListener("DOMContentLoaded", () => {
     "máquina de ozono doméstica": "https://res.cloudinary.com/dknm8qct5/image/upload/v1743112068/ozono_db5no6.jpg",
     "desinfectante digital de ozono": "https://res.cloudinary.com/dknm8qct5/image/upload/v1743112068/ozono_db5no6.jpg"
  };
+  function extractProductName(url) {
+    const match = url.match(/v\d+\/([^.]+)[._-]/); // Captura el nombre del producto antes del primer _ o .
+    return match ? match[1].toLowerCase().replace(/[-_]/g, ' ') : null;
+  }
+
+  function getVersion(url) {
+    const match = url.match(/(v\d+)\//);
+    return match ? match[1] : null;
+  }
+
+  function similarity(str1, str2) {
+    let matchCount = 0;
+    const minLength = Math.min(str1.length, str2.length);
+    for (let i = 0; i < minLength; i++) {
+      if (str1[i] === str2[i]) matchCount++;
+    }
+    return matchCount / Math.max(str1.length, str2.length);
+  }
+
+  function fixUrl(newUrl) {
+    const newProductName = extractProductName(newUrl);
+    const newVersion = getVersion(newUrl);
+
+    let bestMatch = null;
+    let bestScore = 0.0;
+
+    for (const goodUrl of goodUrls) {
+      const goodProductName = extractProductName(goodUrl);
+      const goodVersion = getVersion(goodUrl);
+      const score = similarity(newProductName, goodProductName);
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = goodUrl;
+      }
+    }
+
+    if (bestScore > 0.6 && bestMatch) {
+      const correctVersion = getVersion(bestMatch);
+      return newUrl.replace(newVersion, correctVersion);
+    }
+
+    return newUrl;
+  }
+
+  const testUrl = "https://res.cloudinary.com/dknm8qct5/image/upload/v1742987654/JABON-DE-OLIVA-CON-ACEITE-NATURAL_xy9l4m.jpg";
+  console.log("URL corregida:", fixUrl(testUrl));
+});
+
   // URL de respaldo en caso de error (por ejemplo, error 404)
   const fallbackImageUrl = "https://tu-dominio.com/imagenes/fallback.jpg";
 
