@@ -122,7 +122,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let bestScore = 0.0;
     for (const goodUrl of goodUrls) {
       const goodProductName = extractProductName(goodUrl);
-      const score = similarity(newProductName, goodProductName);
+      let score = similarity(newProductName, goodProductName);
+      // Si uno de los nombres contiene al otro, se asigna similitud máxima.
+      if (goodProductName.includes(newProductName) || newProductName.includes(goodProductName)) {
+        score = 1;
+      }
       if (score > bestScore) {
         bestScore = score;
         bestMatch = goodUrl;
