@@ -257,7 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Se elimina el mensaje después de 5 segundos (duración de la animación)
     setTimeout(() => {
       welcome.remove();
-    }, 15.000);
+    }, 15000);
   }
 
   // Llamadas de configuración y listeners
