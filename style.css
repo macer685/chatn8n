@@ -111,22 +111,6 @@ body {
 /* ANIMACIONES NUEVAS */
 
 /* Keyframes para la animación del contenedor del chat */
-@keyframes fadeInSlide {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Clase para aplicar la animación al contenedor del chat */
-.animate-chat {
-  animation: fadeInSlide 0.8s ease-out forwards;
-}
-
 /* Keyframes para el mensaje de bienvenida */
 @keyframes fadeInOut {
   0% {
@@ -149,7 +133,7 @@ body {
 
 /* Clase para el mensaje de bienvenida */
 .welcome-message {
-  animation: fadeInOut 4s ease-in-out forwards;
+  animation: fadeInOut 8s ease-in-out forwards;
   background: #007bff;
   color: #fff;
   padding: 10px;
@@ -158,4 +142,3 @@ body {
   margin-bottom: 10px;
   font-weight: bold;
 }
-
