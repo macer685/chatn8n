@@ -140,6 +140,30 @@ document.addEventListener("DOMContentLoaded", () => {
     return newUrl;
   }
 
+  // Función para reconstruir la URL en caso de error en la carga
+  function rebuildUrl(badUrl) {
+    const badProductName = extractProductName(badUrl);
+    const badVersion = getVersion(badUrl);
+    let bestMatch = null;
+    let bestScore = 0.0;
+    for (const goodUrl of goodUrls) {
+      const goodProductName = extractProductName(goodUrl);
+      let score = similarity(badProductName, goodProductName);
+      if (goodProductName.includes(badProductName) || badProductName.includes(goodProductName)) {
+        score = 1;
+      }
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = goodUrl;
+      }
+    }
+    if (bestScore > 0.6 && bestMatch) {
+      const correctVersion = getVersion(bestMatch);
+      return badUrl.replace(badVersion, correctVersion);
+    }
+    return null;
+  }
+
   // Función para agregar mensajes al chat y procesar Markdown para imágenes
   function addMessage(text, type) {
     const messageElement = document.createElement("div");
@@ -169,12 +193,19 @@ document.addEventListener("DOMContentLoaded", () => {
       img.style.maxWidth = "100%";
       img.style.borderRadius = "8px";
       img.style.marginTop = "5px";
-      // Fallback en caso de error al cargar la imagen.
+      // Fallback y reconstrucción forzada en caso de error al cargar la imagen.
       img.dataset.errorHandled = "false";
       img.onerror = function() {
         if (this.dataset.errorHandled === "false") {
           this.dataset.errorHandled = "true";
-          this.src = "https://tu-dominio.com/imagenes/fallback.jpg";
+          // Intentar reconstruir la URL
+          const rebuiltUrl = rebuildUrl(this.src);
+          if (rebuiltUrl && rebuiltUrl !== this.src) {
+            console.log("Reintentando con URL reconstruida:", rebuiltUrl);
+            this.src = rebuiltUrl;
+          } else {
+            this.src = "https://tu-dominio.com/imagenes/fallback.jpg";
+          }
         }
       };
       messageElement.appendChild(img);
