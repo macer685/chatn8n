@@ -57,8 +57,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Función para extraer el nombre del producto de la URL
   function extractProductName(url) {
-    const match = url.match(/v\d+\/([^.]+)[._-]/);
-    return match ? match[1].toLowerCase().replace(/[-_]/g, ' ') : null;
+    // Captura la parte del nombre del archivo sin extensión, considerando opcionalmente la versión.
+    const regex = /\/upload\/(?:v\d+\/)?([^\/]+)\.[a-z]+$/i;
+    const match = url.match(regex);
+    if (match) {
+      let fileName = match[1];
+      // Elimina el sufijo aleatorio, asumiendo que es un guión bajo seguido de 5 a 7 caracteres.
+      fileName = fileName.replace(/_[a-z0-9]{5,7}$/i, "");
+      // Normaliza: convierte a minúsculas y reemplaza guiones bajos por espacios.
+      return fileName.toLowerCase().replace(/_/g, ' ');
+    }
+    return null;
   }
 
   // Función para extraer el segmento variable completo de la URL
@@ -121,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (bestScore > 0.6 && bestMatch) {
       const correctVersion = getVersion(bestMatch);
-      // Reemplaza el segmento variable en la URL nueva por el correcto
+      // Reemplaza el segmento variable en la URL nueva por el correcto.
       return newUrl.replace(newVersion, correctVersion);
     }
     return newUrl;
@@ -138,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let match;
 
     while ((match = markdownImageRegex.exec(text)) !== null) {
-      // Si hay texto previo, se agrega como párrafo
+      // Si hay texto previo, se agrega como párrafo.
       if (match.index > lastIndex) {
         const textFragment = text.substring(lastIndex, match.index).trim();
         if (textFragment) {
@@ -147,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
           messageElement.appendChild(textElement);
         }
       }
-      // Se procesa la URL de la imagen para corregirla si es necesario
+      // Se procesa la URL de la imagen para corregirla si es necesario.
       let imageUrl = fixUrl(match[2].trim());
       console.log("URL procesada:", imageUrl);
       const img = document.createElement("img");
@@ -156,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
       img.style.maxWidth = "100%";
       img.style.borderRadius = "8px";
       img.style.marginTop = "5px";
-      // Fallback en caso de error al cargar la imagen
+      // Fallback en caso de error al cargar la imagen.
       img.dataset.errorHandled = "false";
       img.onerror = function() {
         if (this.dataset.errorHandled === "false") {
@@ -167,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
       messageElement.appendChild(img);
       lastIndex = markdownImageRegex.lastIndex;
     }
-    // Si queda texto residual después de procesar imágenes
+    // Si queda texto residual después de procesar imágenes.
     if (lastIndex < text.length) {
       const remainingText = text.substring(lastIndex).trim();
       if (remainingText) {
