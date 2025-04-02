@@ -1,4 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Función para generar un ID único para el usuario
+  function generateUserId() {
+    return 'user-' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // Obtener el user id guardado o generarlo si no existe
+  let userId = localStorage.getItem("userId");
+  if (!userId) {
+    userId = generateUserId();
+    localStorage.setItem("userId", userId);
+  }
   // Webhook de n8n para el chat
   const webhookUrl = "https://macercreative.app.n8n.cloud/webhook/chat";
 
