@@ -235,29 +235,30 @@ document.addEventListener("DOMContentLoaded", () => {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 
-  // Función para enviar el mensaje al webhook de n8n
   async function sendMessage() {
-    const msg = msgInput.value.trim();
-    if (!msg) return;
-    addMessage(msg, "sent");
-    msgInput.value = "";
-    try {
-      const response = await fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mensaje: msg })
-      });
-      if (response.ok) {
-        const data = await response.json();
-        // Se espera que la respuesta incluya 'respuesta' (puede incluir texto y/o markdown con imágenes)
-        addMessage(data.respuesta || "Sin respuesta", "received");
-      } else {
-        addMessage("Error en la respuesta del servidor.", "received");
-      }
-    } catch (error) {
-      addMessage("No se pudo conectar con el servidor.", "received");
+  const msg = msgInput.value.trim();
+  if (!msg) return;
+  addMessage(msg, "sent");
+  msgInput.value = "";
+  try {
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: userId, // Incluye el userId en el cuerpo de la solicitud
+        mensaje: msg
+      })
+    });
+    if (response.ok) {
+      const data = await response.json();
+      addMessage(data.respuesta || "Sin respuesta", "received");
+    } else {
+      addMessage("Error en la respuesta del servidor.", "received");
     }
+  } catch (error) {
+    addMessage("No se pudo conectar con el servidor.", "received");
   }
+}
 
   // NUEVO: Función para mostrar un mensaje de bienvenida animado
   function showWelcomeMessage() {
