@@ -234,8 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
     messagesDiv.appendChild(messageElement);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
-
-  async function sendMessage() {
+async function sendMessage() {
     const msg = msgInput.value.trim();
     if (!msg) return;
     
@@ -243,13 +242,17 @@ document.addEventListener("DOMContentLoaded", () => {
     updateMessageCount();
     msgInput.value = "";
 
-    // Agregar mensaje de espera con un contador
-    let seconds = 0;
+    // Crear el mensaje de espera y asignarle un ID
     let waitingMessage = addMessage("Esperando respuesta... (0s)", "waiting");
+    let seconds = 0;
 
+    // Iniciar el contador de segundos
     const interval = setInterval(() => {
         seconds++;
-        waitingMessage.textContent = `Esperando respuesta... (${seconds}s)`;
+        let waitingElement = document.getElementById("waiting-message");
+        if (waitingElement) {
+            waitingElement.textContent = `Esperando respuesta... (${seconds}s)`;
+        }
     }, 1000);
 
     try {
@@ -266,18 +269,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.ok) {
             const data = await response.json();
-            waitingMessage.remove(); // Eliminar el mensaje de espera
+            document.getElementById("waiting-message")?.remove(); // Eliminar mensaje de espera
             addMessage(data.respuesta || "Sin respuesta", "received");
         } else {
-            waitingMessage.remove();
+            document.getElementById("waiting-message")?.remove();
             addMessage("Error en la respuesta del servidor.", "received");
         }
     } catch (error) {
         clearInterval(interval);
-        waitingMessage.remove();
+        document.getElementById("waiting-message")?.remove();
         addMessage("No se pudo conectar con el servidor.", "received");
     }
 }
+
 
 
   // NUEVO: Función para mostrar un mensaje de bienvenida animado
