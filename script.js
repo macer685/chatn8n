@@ -237,22 +237,18 @@ document.addEventListener("DOMContentLoaded", () => {
 async function sendMessage() {
     const msg = msgInput.value.trim();
     if (!msg) return;
-    
-    addMessage(msg, "sent");
-    updateMessageCount();
+
+    addMessage(msg, "sent"); // Agrega el mensaje enviado
+    updateMessageCount(); // Actualiza contador de mensajes
     msgInput.value = "";
 
-    // Crear el mensaje de espera y asignarle un ID
-    let waitingMessage = addMessage("Esperando respuesta... (0s)", "waiting");
+    // Crear mensaje de espera
+    const waitingMessage = addMessage("Esperando respuesta... (0s)", "waiting");
     let seconds = 0;
 
-    // Iniciar el contador de segundos
+    // Iniciar contador de segundos
     const interval = setInterval(() => {
-        seconds++;
-        let waitingElement = document.getElementById("waiting-message");
-        if (waitingElement) {
-            waitingElement.textContent = `Esperando respuesta... (${seconds}s)`;
-        }
+        waitingMessage.textContent = `Esperando respuesta... (${++seconds}s)`;
     }, 1000);
 
     try {
@@ -265,22 +261,23 @@ async function sendMessage() {
             })
         });
 
-        clearInterval(interval); // Detener el contador
+        clearInterval(interval); // Detener contador
 
         if (response.ok) {
             const data = await response.json();
-            document.getElementById("waiting-message")?.remove(); // Eliminar mensaje de espera
+            waitingMessage.remove(); // Eliminar mensaje de espera
             addMessage(data.respuesta || "Sin respuesta", "received");
         } else {
-            document.getElementById("waiting-message")?.remove();
+            waitingMessage.remove();
             addMessage("Error en la respuesta del servidor.", "received");
         }
     } catch (error) {
         clearInterval(interval);
-        document.getElementById("waiting-message")?.remove();
+        waitingMessage.remove();
         addMessage("No se pudo conectar con el servidor.", "received");
     }
 }
+
 
 
 
