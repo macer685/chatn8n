@@ -243,6 +243,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // Inicia el contador de respuesta
     let seconds = 0;
     const waitingMessage = addMessage(`Esperando respuesta... (0s)`, "waiting");
+    // Dentro de tu código, cuando creas el mensaje de espera:
+
+// Personaliza el estilo usando .style:
+waitingMessage.style.backgroundColor = "#007bff"; // Fondo azul
+waitingMessage.style.color = "#fff";              // Texto blanco
+waitingMessage.style.padding = "5px 10px";          // Espaciado interno
+waitingMessage.style.borderRadius = "5px";          // Bordes redondeados
+waitingMessage.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)";
+waitingMessage.style.fontSize = "14px";             // Tamaño de fuente
+waitingMessage.style.marginTop = "10px";            // Margen superior
+
     const interval = setInterval(() => {
       seconds++;
       waitingMessage.textContent = `Esperando respuesta... (${seconds}s)`;
