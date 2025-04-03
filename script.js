@@ -236,29 +236,49 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function sendMessage() {
-  const msg = msgInput.value.trim();
-  if (!msg) return;
-  addMessage(msg, "sent");
-  msgInput.value = "";
-  try {
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: userId, // Incluye el userId en el cuerpo de la solicitud
-        mensaje: msg
-      })
-    });
-    if (response.ok) {
-      const data = await response.json();
-      addMessage(data.respuesta || "Sin respuesta", "received");
-    } else {
-      addMessage("Error en la respuesta del servidor.", "received");
+    const msg = msgInput.value.trim();
+    if (!msg) return;
+    
+    addMessage(msg, "sent");
+    updateMessageCount();
+    msgInput.value = "";
+
+    // Agregar mensaje de espera con un contador
+    let seconds = 0;
+    let waitingMessage = addMessage("Esperando respuesta... (0s)", "waiting");
+
+    const interval = setInterval(() => {
+        seconds++;
+        waitingMessage.textContent = `Esperando respuesta... (${seconds}s)`;
+    }, 1000);
+
+    try {
+        const response = await fetch(webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                userId: userId,
+                mensaje: msg
+            })
+        });
+
+        clearInterval(interval); // Detener el contador
+
+        if (response.ok) {
+            const data = await response.json();
+            waitingMessage.remove(); // Eliminar el mensaje de espera
+            addMessage(data.respuesta || "Sin respuesta", "received");
+        } else {
+            waitingMessage.remove();
+            addMessage("Error en la respuesta del servidor.", "received");
+        }
+    } catch (error) {
+        clearInterval(interval);
+        waitingMessage.remove();
+        addMessage("No se pudo conectar con el servidor.", "received");
     }
-  } catch (error) {
-    addMessage("No se pudo conectar con el servidor.", "received");
-  }
 }
+
 
   // NUEVO: Función para mostrar un mensaje de bienvenida animado
   function showWelcomeMessage() {
