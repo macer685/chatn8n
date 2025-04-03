@@ -1,29 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
- // Función para generar un ID único para el usuario
-      function generateUserId() {
-        return 'user-' + Math.random().toString(36).substr(2, 9);
-      }
-      // Obtener el user id guardado o generarlo si no existe
-      let userId = localStorage.getItem("userId");
-      if (!userId) {
-        userId = generateUserId();
-        localStorage.setItem("userId", userId);
-      }
+  // Función para generar un ID único para el usuario
+  function generateUserId() {
+    return 'user-' + Math.random().toString(36).substr(2, 9);
+  }
+  // Obtener el user id guardado o generarlo si no existe
+  let userId = localStorage.getItem("userId");
+  if (!userId) {
+    userId = generateUserId();
+    localStorage.setItem("userId", userId);
+  }
  
   // Webhook de n8n para el chat
   const webhookUrl = "https://macercreative.app.n8n.cloud/webhook/chat";
-
+ 
   // Elementos del DOM
   const messagesDiv = document.getElementById("messages");
   const msgInput = document.getElementById("msgInput");
   const sendBtn = document.getElementById("sendBtn");
   const backBtn = document.getElementById("backBtn");
-
+ 
   // Botón "Volver" redirige a la página principal
   backBtn.addEventListener("click", () => {
     window.location.href = "https://www.macer.digital/";
   });
-
+ 
   // Array de URLs de referencia "buenas" (las que están en la base de datos)
   let goodUrls = [
     "https://res.cloudinary.com/dknm8qct5/image/upload/v1742958440/GANODERMA-SOLUBLE-COFFEE_ptuzzd.jpg",
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "https://res.cloudinary.com/dknm8qct5/image/upload/v1743364825/generador_de_ozono_digital_para_uso_domestico_c0qt4t.jpg",
     "https://res.cloudinary.com/dknm8qct5/image/upload/v1743364699/reloj_inteligente_smart_whatch_kn9hdm.jpg"
   ];
-
+  
   // Función para extraer el nombre del producto de la URL
   function extractProductName(url) {
     // Captura la parte del nombre del archivo sin extensión, considerando opcionalmente la versión.
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return null;
   }
-
+  
   // Función para extraer el segmento variable completo de la URL
   // Ejemplo: a partir de "https://res.cloudinary.com/dknm8qct5/image/upload/v1743364699/reloj_inteligente_smart_whatch_kn9hdm.jpg"
   // devuelve "v1743364699/reloj_inteligente_smart_whatch_kn9hdm.jpg"
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (uploadIndex === -1) return null;
     return url.substring(uploadIndex + 8);
   }
-
+  
   // Función de Levenshtein para calcular la distancia entre dos cadenas
   function levenshtein(a, b) {
     const matrix = [];
@@ -117,14 +117,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return matrix[bLen][aLen];
   }
-
+  
   // Función para calcular la similitud (valor entre 0 y 1) usando la distancia de Levenshtein
   function similarity(a, b) {
     const distance = levenshtein(a, b);
     const maxLen = Math.max(a.length, b.length);
     return maxLen === 0 ? 1 : 1 - distance / maxLen;
   }
-
+  
   // Función para corregir la URL usando las URLs "buenas"
   function fixUrl(newUrl) {
     const newProductName = extractProductName(newUrl);
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return newUrl;
   }
-
+  
   // Función para reconstruir la URL en caso de error en la carga
   function rebuildUrl(badUrl) {
     const badProductName = extractProductName(badUrl);
@@ -174,19 +174,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return null;
   }
-
+  
   // Función para agregar mensajes al chat y procesar Markdown para imágenes
+  // Se devuelve el elemento creado para poder modificarlo (por ejemplo, para el contador)
   function addMessage(text, type) {
     const messageElement = document.createElement("div");
     messageElement.classList.add("chat-message", type);
-
+  
     // Expresión regular para detectar imágenes en formato Markdown: ![alt](url)
     const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/gi;
     let lastIndex = 0;
     let match;
-
+  
     while ((match = markdownImageRegex.exec(text)) !== null) {
-      // Si hay texto previo, se agrega como párrafo.
       if (match.index > lastIndex) {
         const textFragment = text.substring(lastIndex, match.index).trim();
         if (textFragment) {
@@ -195,7 +195,6 @@ document.addEventListener("DOMContentLoaded", () => {
           messageElement.appendChild(textElement);
         }
       }
-      // Se procesa la URL de la imagen para corregirla si es necesario.
       let imageUrl = fixUrl(match[2].trim());
       console.log("URL procesada:", imageUrl);
       const img = document.createElement("img");
@@ -209,7 +208,6 @@ document.addEventListener("DOMContentLoaded", () => {
       img.onerror = function() {
         if (this.dataset.errorHandled === "false") {
           this.dataset.errorHandled = "true";
-          // Intentar reconstruir la URL
           const rebuiltUrl = rebuildUrl(this.src);
           if (rebuiltUrl && rebuiltUrl !== this.src) {
             console.log("Reintentando con URL reconstruida:", rebuiltUrl);
@@ -222,7 +220,6 @@ document.addEventListener("DOMContentLoaded", () => {
       messageElement.appendChild(img);
       lastIndex = markdownImageRegex.lastIndex;
     }
-    // Si queda texto residual después de procesar imágenes.
     if (lastIndex < text.length) {
       const remainingText = text.substring(lastIndex).trim();
       if (remainingText) {
@@ -233,45 +230,59 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     messagesDiv.appendChild(messageElement);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    return messageElement;
   }
-
+  
+  // Función para enviar el mensaje al webhook de n8n con contador de respuesta
   async function sendMessage() {
-  const msg = msgInput.value.trim();
-  if (!msg) return;
-  addMessage(msg, "sent");
-  msgInput.value = "";
-  try {
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: userId, // Incluye el userId en el cuerpo de la solicitud
-        mensaje: msg
-      })
-    });
-    if (response.ok) {
-      const data = await response.json();
-      addMessage(data.respuesta || "Sin respuesta", "received");
-    } else {
-      addMessage("Error en la respuesta del servidor.", "received");
+    const msg = msgInput.value.trim();
+    if (!msg) return;
+    addMessage(msg, "sent");
+    msgInput.value = "";
+  
+    // Inicia el contador de respuesta
+    let seconds = 0;
+    const waitingMessage = addMessage(`Esperando respuesta... (0s)`, "waiting");
+    const interval = setInterval(() => {
+      seconds++;
+      waitingMessage.textContent = `Esperando respuesta... (${seconds}s)`;
+    }, 1000);
+  
+    try {
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: userId, // Incluye el userId en el cuerpo de la solicitud
+          mensaje: msg
+        })
+      });
+      clearInterval(interval);
+      waitingMessage.remove();
+      if (response.ok) {
+        const data = await response.json();
+        addMessage(data.respuesta || "Sin respuesta", "received");
+      } else {
+        addMessage("Error en la respuesta del servidor.", "received");
+      }
+    } catch (error) {
+      clearInterval(interval);
+      waitingMessage.remove();
+      addMessage("No se pudo conectar con el servidor.", "received");
     }
-  } catch (error) {
-    addMessage("No se pudo conectar con el servidor.", "received");
   }
-}
-
+  
   // NUEVO: Función para mostrar un mensaje de bienvenida animado
   function showWelcomeMessage() {
     const welcome = document.createElement("div");
     welcome.classList.add("welcome-message");
     welcome.textContent = "¡PRODUCTOS DE LA MEJOR CALIDAD  SALUDABLES!";
     messagesDiv.appendChild(welcome);
-    // Se elimina el mensaje después de 5 segundos (duración de la animación)
     setTimeout(() => {
       welcome.remove();
     }, 8000);
   }
-
+  
   // Llamadas de configuración y listeners
   showWelcomeMessage();
   sendBtn.addEventListener("click", sendMessage);
