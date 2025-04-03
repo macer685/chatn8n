@@ -242,7 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
     // Inicia el contador de respuesta
     let seconds = 0;
-    const waitingMessage = addMessage(`Esperando respuesta... (0s)`, "waiting");
+    const waitingMessage = addMessage(`Esperando respuesta de Tatiana Bustos... (0s)`, "waiting");
     // Dentro de tu código, cuando creas el mensaje de espera:
 
 // Personaliza el estilo usando .style:
