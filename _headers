@@ -1,5 +1,5 @@
 /*
   
-  Access-Control-Allow-Origin: https://macercreative.app.n8n.cloud
+  Access-Control-Allow-Origin: https://macercreative.app.n8n.cloud/webhook/recuperar-chats
   Access-Control-Allow-Methods: GET, POST, OPTIONS
   Access-Control-Allow-Headers: Content-Type
