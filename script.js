@@ -10,8 +10,35 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("userId", userId);
   }
  
-  // Webhook de n8n para el chat
+  // Webhook de n8n para enviar mensajes del chat
   const webhookUrl = "https://macercreative.app.n8n.cloud/webhook/chat";
+  
+  // URL del webhook de n8n para recuperar chats desde Google Sheets
+  /* ============================ */
+  /* INICIO: Recuperar chats desde Google Sheets */
+  const recuperarChatsUrl = "https://macercreative.app.n8n.cloud/webhook/recuperar-chats";
+
+  async function recuperarChats() {
+    try {
+      const response = await fetch(recuperarChatsUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuario: userId })
+      });
+      if (!response.ok) {
+        throw new Error(`Error al recuperar chats: ${response.statusText}`);
+      }
+      const chats = await response.json();
+      // Se asume que 'chats' es un array de objetos con la propiedad 'texto'
+      chats.forEach(mensaje => {
+        addMessage(mensaje.texto || mensaje, "received");
+      });
+    } catch (error) {
+      console.error("Error en recuperarChats:", error);
+    }
+  }
+  /* FIN: Recuperar chats desde Google Sheets */
+  /* ============================ */
  
   // Elementos del DOM
   const messagesDiv = document.getElementById("messages");
@@ -244,16 +271,15 @@ document.addEventListener("DOMContentLoaded", () => {
     let seconds = 0;
     const waitingMessage = addMessage(`Esperando respuesta de Tatiana Bustos... (0s)`, "waiting");
     // Dentro de tu código, cuando creas el mensaje de espera:
-
-// Personaliza el estilo usando .style:
-waitingMessage.style.backgroundColor = "#007bff"; // Fondo azul
-waitingMessage.style.color = "#fff";              // Texto blanco
-waitingMessage.style.padding = "5px 10px";          // Espaciado interno
-waitingMessage.style.borderRadius = "5px";          // Bordes redondeados
-waitingMessage.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)";
-waitingMessage.style.fontSize = "14px";             // Tamaño de fuente
-waitingMessage.style.marginTop = "10px";            // Margen superior
-
+    // Personaliza el estilo usando .style:
+    waitingMessage.style.backgroundColor = "#007bff"; // Fondo azul
+    waitingMessage.style.color = "#fff";              // Texto blanco
+    waitingMessage.style.padding = "5px 10px";          // Espaciado interno
+    waitingMessage.style.borderRadius = "5px";          // Bordes redondeados
+    waitingMessage.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)";
+    waitingMessage.style.fontSize = "14px";             // Tamaño de fuente
+    waitingMessage.style.marginTop = "10px";            // Margen superior
+  
     const interval = setInterval(() => {
       seconds++;
       waitingMessage.textContent = `Esperando respuesta... (${seconds}s)`;
@@ -296,6 +322,8 @@ waitingMessage.style.marginTop = "10px";            // Margen superior
   
   // Llamadas de configuración y listeners
   showWelcomeMessage();
+  // Llamamos a la función para recuperar los chats almacenados desde Google Sheets
+  recuperarChats();
   sendBtn.addEventListener("click", sendMessage);
   msgInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
