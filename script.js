@@ -39,14 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   /* FIN: Recuperar chats desde Google Sheets */
   /* ============================ */
-  fetch('https://macercreative.app.n8n.cloud/webhook/recuperar-chats')
-  .then(response => response.json())
-  .then(data => {
-    console.log("Respuesta del servidor:", data); // Aquí puedes ver los mensajes recuperados
-    // Aquí puedes agregar el código para mostrar los mensajes en el chat
-  })
-  .catch(error => console.error("Error en fetch:", error));
-
   // Elementos del DOM
   const messagesDiv = document.getElementById("messages");
   const msgInput = document.getElementById("msgInput");
