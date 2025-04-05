@@ -22,11 +22,12 @@ async function recuperarChats() {
   try {
     console.log("Enviando al webhook recuperarChats:", JSON.stringify({ userId }));
 
-    const response = await fetch(recuperarChatsUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id_usuario: userId })
-    });
+    const url = `https://chatproxy.macercreative.workers.dev/?url=https://macercreative.app.n8n.cloud/webhook/recuperar-chats&id_usuario=${encodeURIComponent(userId)}`;
+
+const response = await fetch(url, {
+  method: "GET"
+});
+
     if (!response.ok) {
       throw new Error(`Error al recuperar chats: ${response.statusText}`);
     }
