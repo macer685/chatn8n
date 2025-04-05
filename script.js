@@ -20,6 +20,8 @@ const recuperarChatsUrl = "https://chatproxy.macercreative.workers.dev/?url=http
 
 async function recuperarChats() {
   try {
+    console.log("Enviando al webhook recuperarChats:", JSON.stringify({ userId }));
+
     const response = await fetch(recuperarChatsUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
