@@ -32,19 +32,13 @@ async function recuperarChats() {
       throw new Error(`Error al recuperar chats: ${response.statusText}`);
     }
 
-    const chats = await response.json();
+    const data = await response.json();
+    const chats = data.mensajes || []; // aseguramos que sea un array
 
-    // Ordenar los chats por fecha
-    chats.sort((a, b) => new Date(a["fecha y hora"]) - new Date(b["fecha y hora"]));
-
-    // Mostrar mensajes de usuario y respuestas
     chats.forEach(mensaje => {
-      if (mensaje["mensaje de usuario"]) {
-        addMessage(mensaje["mensaje de usuario"], "received");
-      }
-      if (mensaje["respuesta"]) {
-        addMessage(mensaje["respuesta"], "received");
-      }
+      const texto = mensaje.content || mensaje.texto || mensaje;
+      const tipo = mensaje.role === "user" ? "sent" : "received";
+      addMessage(texto, tipo);
     });
 
   } catch (error) {
