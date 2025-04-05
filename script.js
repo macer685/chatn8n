@@ -32,11 +32,12 @@ async function recuperarChats() {
       throw new Error(`Error al recuperar chats: ${response.statusText}`);
     }
 
-    const chats = await response.json();
+    const data = await response.json();
+    const chats = data.mensajes || []; // aseguramos que sea un array
 
     chats.forEach(mensaje => {
       const texto = mensaje.content || mensaje.texto || mensaje;
-      const tipo = mensaje.role === "user" ? "sent" : "received"; // "user" es enviado, lo demás recibido
+      const tipo = mensaje.role === "user" ? "sent" : "received";
       addMessage(texto, tipo);
     });
 
@@ -45,6 +46,7 @@ async function recuperarChats() {
   }
 }
 /* FIN: Recuperar chats desde Google Sheets */
+
 
 
   // Elementos del DOM
