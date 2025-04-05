@@ -25,7 +25,7 @@ async function recuperarChats() {
     const response = await fetch(recuperarChatsUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId })
+      body: JSON.stringify({ id_usuario: userId })
     });
     if (!response.ok) {
       throw new Error(`Error al recuperar chats: ${response.statusText}`);
