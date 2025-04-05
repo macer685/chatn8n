@@ -15,27 +15,34 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // URL del webhook de n8n para recuperar chats desde Google Sheets
   /* ============================ */
- /* INICIO: Recuperar chats desde Google Sheets */
+/* INICIO: Recuperar chats desde Google Sheets */
 const recuperarChatsUrl = "https://chatproxy.macercreative.workers.dev/?url=https://macercreative.app.n8n.cloud/webhook/recuperar-chats";
 
 async function recuperarChats() {
   try {
     console.log("Enviando al webhook recuperarChats:", JSON.stringify({ userId }));
 
-    const url = `https://chatproxy.macercreative.workers.dev/?url=https://macercreative.app.n8n.cloud/webhook/recuperar-chats&id_usuario=${encodeURIComponent(userId)}`;
+    const url = `${recuperarChatsUrl}&id_usuario=${encodeURIComponent(userId)}`;
 
-const response = await fetch(url, {
-  method: "GET"
-});
+    const response = await fetch(url, {
+      method: "GET"
+    });
 
     if (!response.ok) {
       throw new Error(`Error al recuperar chats: ${response.statusText}`);
     }
-    const chats = await response.json();
-    // Se asume que 'chats' es un array de objetos con la propiedad 'texto'
-    chats.forEach(mensaje => {
-      addMessage(mensaje.texto || mensaje, "received");
-    });
+
+    const data = await response.json(); // Esto contiene el objeto { mensajes: [...] }
+    const chats = data.mensajes;
+
+    if (Array.isArray(chats)) {
+      chats.forEach(mensaje => {
+        addMessage(mensaje.content || mensaje.texto || mensaje, "received");
+      });
+    } else {
+      console.warn("La respuesta no contiene un array válido en 'mensajes'");
+    }
+
   } catch (error) {
     console.error("Error en recuperarChats:", error);
   }
