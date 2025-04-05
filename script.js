@@ -22,7 +22,7 @@ async function recuperarChats() {
   try {
     console.log("Enviando al webhook recuperarChats:", JSON.stringify({ userId }));
 
-    const url = `${recuperarChatsUrl}&id_usuario=${encodeURIComponent(userId)}`;
+    const url = `https://chatproxy.macercreative.workers.dev/?url=https://macercreative.app.n8n.cloud/webhook/recuperar-chats&id_usuario=${encodeURIComponent(userId)}`;
 
     const response = await fetch(url, {
       method: "GET"
@@ -32,22 +32,20 @@ async function recuperarChats() {
       throw new Error(`Error al recuperar chats: ${response.statusText}`);
     }
 
-    const data = await response.json(); // Esto contiene el objeto { mensajes: [...] }
-    const chats = data.mensajes;
+    const chats = await response.json();
 
-    if (Array.isArray(chats)) {
-      chats.forEach(mensaje => {
-        addMessage(mensaje.content || mensaje.texto || mensaje, "received");
-      });
-    } else {
-      console.warn("La respuesta no contiene un array válido en 'mensajes'");
-    }
+    chats.forEach(mensaje => {
+      const texto = mensaje.content || mensaje.texto || mensaje;
+      const tipo = mensaje.role === "user" ? "sent" : "received"; // "user" es enviado, lo demás recibido
+      addMessage(texto, tipo);
+    });
 
   } catch (error) {
     console.error("Error en recuperarChats:", error);
   }
 }
 /* FIN: Recuperar chats desde Google Sheets */
+
 
   // Elementos del DOM
   const messagesDiv = document.getElementById("messages");
