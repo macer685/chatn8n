@@ -33,12 +33,14 @@ async function recuperarChats() {
     }
 
     const data = await response.json();
-    const chats = data.mensajes || []; // aseguramos que sea un array
+    const chats = data.mensajes || [];
 
     chats.forEach(mensaje => {
-      const texto = mensaje.content || mensaje.texto || mensaje;
-      const tipo = mensaje.role === "user" ? "sent" : "received";
-      addMessage(texto, tipo);
+      const texto = mensaje.content || mensaje.texto || "";
+      const tipo = mensaje.role === "user" ? "sent" : "received"; // user = enviado, assistant = recibido
+      if (texto.trim() !== "") {
+        addMessage(texto, tipo);
+      }
     });
 
   } catch (error) {
@@ -46,6 +48,7 @@ async function recuperarChats() {
   }
 }
 /* FIN: Recuperar chats desde Google Sheets */
+
 
 
 
