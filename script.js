@@ -15,30 +15,30 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // URL del webhook de n8n para recuperar chats desde Google Sheets
   /* ============================ */
-  /* INICIO: Recuperar chats desde Google Sheets */
-  const recuperarChatsUrl = "https://macercreative.app.n8n.cloud/webhook/recuperar-chats";
+ /* INICIO: Recuperar chats desde Google Sheets */
+const recuperarChatsUrl = "https://chatproxy.macercreative.workers.dev/?url=https://macercreative.app.n8n.cloud/webhook/recuperar-chats";
 
-  async function recuperarChats() {
-    try {
-      const response = await fetch(recuperarChatsUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuario: userId })
-      });
-      if (!response.ok) {
-        throw new Error(`Error al recuperar chats: ${response.statusText}`);
-      }
-      const chats = await response.json();
-      // Se asume que 'chats' es un array de objetos con la propiedad 'texto'
-      chats.forEach(mensaje => {
-        addMessage(mensaje.texto || mensaje, "received");
-      });
-    } catch (error) {
-      console.error("Error en recuperarChats:", error);
+async function recuperarChats() {
+  try {
+    const response = await fetch(recuperarChatsUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ usuario: userId })
+    });
+    if (!response.ok) {
+      throw new Error(`Error al recuperar chats: ${response.statusText}`);
     }
+    const chats = await response.json();
+    // Se asume que 'chats' es un array de objetos con la propiedad 'texto'
+    chats.forEach(mensaje => {
+      addMessage(mensaje.texto || mensaje, "received");
+    });
+  } catch (error) {
+    console.error("Error en recuperarChats:", error);
   }
-  /* FIN: Recuperar chats desde Google Sheets */
-  /* ============================ */
+}
+/* FIN: Recuperar chats desde Google Sheets */
+
   // Elementos del DOM
   const messagesDiv = document.getElementById("messages");
   const msgInput = document.getElementById("msgInput");
