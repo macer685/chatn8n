@@ -21,6 +21,7 @@ const recuperarChatsUrl = "https://chatproxy.macercreative.workers.dev/?url=http
 async function recuperarChats() {
   try {
     console.log("Enviando al webhook recuperarChats:", JSON.stringify({ userId }));
+    console.log("userId:", userId);
 
     const url = `https://chatproxy.macercreative.workers.dev/?url=https://macercreative.app.n8n.cloud/webhook/recuperar-chats&id_usuario=${encodeURIComponent(userId)}`;
 
@@ -35,9 +36,11 @@ async function recuperarChats() {
     const data = await response.json();
     const chats = data.mensajes || []; // aseguramos que sea un array
 
+    console.log("📥 Mensajes recuperados:", chats);
+
     chats.forEach(mensaje => {
-      const texto = mensaje.content || mensaje.texto || mensaje;
-      const tipo = mensaje.role === "user" ? "sent" : "received";
+      const texto = mensaje.texto || mensaje.content || mensaje.mensaje || mensaje;
+      const tipo = (mensaje.rol || mensaje.role) === "user" ? "sent" : "received";
       addMessage(texto, tipo);
     });
 
@@ -46,6 +49,7 @@ async function recuperarChats() {
   }
 }
 /* FIN: Recuperar chats desde Google Sheets */
+
 
 
 
