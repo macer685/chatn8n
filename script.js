@@ -12,8 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
  
   // Webhook de n8n para enviar mensajes del chat
   const webhookUrl = "https://macercreative.app.n8n.cloud/webhook/chat";
-  
-  // URL del webhook de n8n para recuperar chats desde Google Sheets
+  console.log("userId:", userId);
+
+   // URL del webhook de n8n para recuperar chats desde Google Sheets
   /* ============================ */
 /* INICIO: Recuperar chats desde Google Sheets */
 const recuperarChatsUrl = "https://chatproxy.macercreative.workers.dev/?url=https://macercreative.app.n8n.cloud/webhook/recuperar-chats";
