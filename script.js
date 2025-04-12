@@ -15,40 +15,42 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // URL del webhook de n8n para recuperar chats desde Google Sheets
   /* ============================ */
-/* INICIO: Recuperar chats desde Google Sheets */
-const recuperarChatsUrl = "https://chatproxy.macercreative.workers.dev/?url=https://macercreative.app.n8n.cloud/webhook/recuperar-chats";
+/* INICIO: Recuperar chats desde Google Sheets (transformación en n8n) */
+const entrada = items[0].json;
 
-async function recuperarChats() {
-  try {
-    console.log("Enviando al webhook recuperarChats:", JSON.stringify({ userId }));
-    console.log("userId:", userId);
+const mensajes = [];
 
-    const url = `https://chatproxy.macercreative.workers.dev/?url=https://macercreative.app.n8n.cloud/webhook/recuperar-chats&id_usuario=${encodeURIComponent(userId)}`;
-
-    const response = await fetch(url, {
-      method: "GET"
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error al recuperar chats: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const chats = data.mensajes || []; // aseguramos que sea un array
-
-    console.log("📥 Mensajes recuperados:", chats);
-
-    chats.forEach(mensaje => {
-      const texto = mensaje.texto || mensaje.content || mensaje.mensaje || mensaje;
-      const tipo = (mensaje.rol || mensaje.role) === "user" ? "sent" : "received";
-      addMessage(texto, tipo);
-    });
-
-  } catch (error) {
-    console.error("Error en recuperarChats:", error);
-  }
+if (entrada.usuario) {
+  mensajes.push({
+    content: entrada.usuario,
+    role: "user"
+  });
 }
-/* FIN: Recuperar chats desde Google Sheets */
+
+if (entrada.productos && Array.isArray(entrada.productos)) {
+  let respuesta = "Tenemos los siguientes productos:\n\n";
+
+  entrada.productos.forEach(producto => {
+    respuesta += `🧼 *${producto.nombre}* (${producto.presentacion})\n`;
+    respuesta += `💵 ${producto.precio}\n`;
+    respuesta += `✨ ${producto.beneficios}\n`;
+    respuesta += `📷 ${producto.imagen}\n\n`;
+  });
+
+  mensajes.push({
+    content: respuesta.trim(),
+    role: "assistant"
+  });
+}
+
+return [
+  {
+    json: {
+      mensajes
+    }
+  }
+];
+/* FIN: Recuperar chats desde Google Sheets (transformación en n8n) */
 
 
 
