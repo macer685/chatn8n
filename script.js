@@ -15,49 +15,59 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // URL del webhook de n8n para recuperar chats desde Google Sheets
   /* ============================ */
-/* INICIO: Recuperar chats desde Google Sheets (transformación en n8n) */
-const entrada = items[0].json;
+/* INICIO: Recuperar chats desde Google Sheets */
+const recuperarChatsUrl = "https://chatproxy.macercreative.workers.dev/?url=https://macercreative.app.n8n.cloud/webhook/recuperar-chats";
 
-const mensajes = [];
+async function recuperarChats() {
+  try {
+    console.log("Enviando al webhook recuperarChats:", JSON.stringify({ userId }));
 
-if (entrada.usuario) {
-  mensajes.push({
-    content: entrada.usuario,
-    role: "user"
-  });
-}
+    const url = `https://chatproxy.macercreative.workers.dev/?url=https://macercreative.app.n8n.cloud/webhook/recuperar-chats&id_usuario=${encodeURIComponent(userId)}`;
 
-if (entrada.productos && Array.isArray(entrada.productos)) {
-  let respuesta = "Tenemos los siguientes productos:\n\n";
+    const response = await fetch(url, {
+      method: "GET"
+    });
 
-  entrada.productos.forEach(producto => {
-    respuesta += `🧼 *${producto.nombre}* (${producto.presentacion})\n`;
-    respuesta += `💵 ${producto.precio}\n`;
-    respuesta += `✨ ${producto.beneficios}\n`;
-    respuesta += `📷 ${producto.imagen}\n\n`;
-  });
-
-  mensajes.push({
-    content: respuesta.trim(),
-    role: "assistant"
-  });
-}
-
-return [
-  {
-    json: {
-      mensajes
+    if (!response.ok) {
+      throw new Error(`Error al recuperar chats: ${response.statusText}`);
     }
+
+    const data = await response.json();
+    const chats = data.mensajes || []; // aseguramos que sea un array
+
+    chats.forEach(mensaje => {
+      // Si el mensaje es tipo texto simple
+      if (typeof mensaje === "string") {
+        addMessage(mensaje, "received");
+        return;
+      }
+
+      // Si el mensaje tiene un campo "texto" o "content"
+      const texto = mensaje.content || mensaje.texto || mensaje.usuario;
+      if (texto) {
+        addMessage(texto, "received");
+      }
+
+      // Si hay productos (estructura especial)
+      if (mensaje.productos && Array.isArray(mensaje.productos)) {
+        mensaje.productos.forEach(producto => {
+          const textoProducto = `🧼 <b>${producto.nombre}</b> (${producto.presentacion})<br>
+💲 ${producto.precio}<br>
+✨ ${producto.beneficios || ""}<br>
+<img src="${producto.imagen}" style="width:100%;max-width:250px;">`;
+
+          addMessage(textoProducto, "received");
+        });
+      }
+    });
+
+  } catch (error) {
+    console.error("Error en recuperarChats:", error);
   }
-];
-/* FIN: Recuperar chats desde Google Sheets (transformación en n8n) */
+}
+/* FIN: Recuperar chats desde Google Sheets */
 
-
-
-
-
-
-  // Elementos del DOM
+ // Elementos del DOM
   const messagesDiv = document.getElementById("messages");
   const msgInput = document.getElementById("msgInput");
   const sendBtn = document.getElementById("sendBtn");
