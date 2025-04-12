@@ -34,39 +34,33 @@ async function recuperarChats() {
     }
 
     const data = await response.json();
-    const chats = data.mensajes || []; // aseguramos que sea un array
+    console.log("Respuesta del webhook:", data);
 
-    chats.forEach(mensaje => {
-      // Si el mensaje es tipo texto simple
-      if (typeof mensaje === "string") {
+    // Mostrar el mensaje del usuario
+    if (data.usuario) {
+      addMessage(data.usuario, "sent");
+    }
+
+    // Mostrar productos si existen
+    if (Array.isArray(data.productos)) {
+      data.productos.forEach(producto => {
+        const mensaje = `
+          <strong>${producto.nombre}</strong><br>
+          Presentación: ${producto.presentacion}<br>
+          Precio: ${producto.precio}<br>
+          Beneficios: ${producto.beneficios}<br>
+          <img src="${producto.imagen}" style="max-width: 100px; border-radius: 8px;">
+        `;
         addMessage(mensaje, "received");
-        return;
-      }
-
-      // Si el mensaje tiene un campo "texto" o "content"
-      const texto = mensaje.content || mensaje.texto || mensaje.usuario;
-      if (texto) {
-        addMessage(texto, "received");
-      }
-
-      // Si hay productos (estructura especial)
-      if (mensaje.productos && Array.isArray(mensaje.productos)) {
-        mensaje.productos.forEach(producto => {
-          const textoProducto = `🧼 <b>${producto.nombre}</b> (${producto.presentacion})<br>
-💲 ${producto.precio}<br>
-✨ ${producto.beneficios || ""}<br>
-<img src="${producto.imagen}" style="width:100%;max-width:250px;">`;
-
-          addMessage(textoProducto, "received");
-        });
-      }
-    });
+      });
+    }
 
   } catch (error) {
     console.error("Error en recuperarChats:", error);
   }
 }
 /* FIN: Recuperar chats desde Google Sheets */
+
 
  // Elementos del DOM
   const messagesDiv = document.getElementById("messages");
